@@ -5,12 +5,12 @@ yum -y install lvm2
 yum -y install wget
 
 # Get Docker in place
-wget xxxxx/docker.repo
+wget https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/docker.repo
 mv docker.repo /etc/yum.repos.d/
 
 yum -y install docker-engine
 
-wget xxxxx/docker.conf
+wget https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/docker.conf
 mkdir /etc/systemd/system/docker.service.d
 mv docker.conf /etc/systemd/system/docker.service.d
 
@@ -26,10 +26,10 @@ docker volume create --name=adbBackup
 docker volume create --name=softAdb
 
 # Set up for first-run 
-wget xxxxx/solace-first-boot.service
+wget https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/solace-first-boot.service
 mv solace-first-boot.service /etc/systemd/system/
 systemctl enable solace-first-boot
 
-wget xxxxx/solace-first-boot.sh
+wget https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/solace-first-boot.sh
 mv solace-first-boot.sh /usr/local/sbin
 chmod +x /usr/local/sbin/solace-first-boot.sh 
