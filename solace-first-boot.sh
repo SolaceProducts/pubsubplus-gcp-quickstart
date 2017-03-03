@@ -2,7 +2,7 @@
 
 cd  /tmp
 wget https://storage.googleapis.com/solace_vmr/latest
-SOLACE_VMR_LATEST = `cat latest`
+SOLACE_VMR_LATEST=`cat latest`
 
 wget  ${SOLACE_VMR_LATEST}
 
