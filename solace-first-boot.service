@@ -1,0 +1,11 @@
+[Unit]
+  Description=Solace First Boot Setup
+  Requires=docker.service
+  After=docker.service
+  Wants=network-online.target
+  After=network-online.target
+[Service]
+  Type=oneshot
+  ExecStart=/usr/local/sbin/first-boot-setup.sh
+[Install]
+  WantedBy=multi-user.target
