@@ -1,5 +1,42 @@
-
 #!/bin/bash
+
+while [[ $# -gt 1 ]]
+do
+key="$1"
+IMAGE=
+USERNAME=admin
+PASSWORD=admin
+
+case $key in
+    -u|--username)
+      USERNAME="$2"
+      shift # past argument
+    ;;
+    -p|--password)
+      PASSWORD="$2"
+      shift # past argument
+    ;;
+    -i|--image)
+      IMAGE="$2"
+      shift # past argument
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+
+echo "`date` Validate we have been passed a VMR image"
+# -----------------------------------------------------
+if [ -z "$IMAGE" ]
+then
+      echo "USAGE: vmr-install.sh --image <Solace Docker Image>"
+      echo 1
+else
+      echo "`date` VMR Image is ${IMAGE}"
+fi
+
 
 echo "`date` Get repositories up to date"
 # ---------------------------------------
@@ -44,7 +81,7 @@ docker volume create --name=softAdb
 
 echo "`date` Load the Solace Docker image"
 # ----------------------------------------
-docker load -i ${1}
+docker load -i ${IMAGE}
 
 echo "`date` Create a Docker instance from Solace Docker image"
 # -------------------------------------------------------------
@@ -59,8 +96,8 @@ docker create \
  -v internalSpool:/usr/sw/internalSpool \
  -v adbBackup:/usr/sw/adb \
  -v softAdb:/usr/sw/internalSpool/softAdb \
- --env 'username_admin_globalaccesslevel=admin' \
- --env 'username_admin_password=admin' \
+ --env 'username_admin_globalaccesslevel=${USERNAME}' \
+ --env 'username_admin_password=${PASSWORD}' \
  --name=solace solace-app:${VMR_VERSION}
 
 echo "`date` Construct systemd for VMR"
