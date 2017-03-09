@@ -8,16 +8,16 @@ This is a 3 step process:
 * Go to the Solace Developer portal and request a Solace Comunity edition VRM. This process will return an email with a Download link.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce_hyper-v/" target="_blank">
-    <img src="https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/images/register.png"/>
+    <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
 </a>
 
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GByte of memory and Centos7 OS:
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
+![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
 
 * Expand the the Management tab to expose the Automation Startup script panel
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
+![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
 
 Cut and paste the code into the panel, replace -link to VMR Docker Image- with the link you recieved in step one.
 
@@ -26,7 +26,7 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 if [ ! -f /var/lib/vmr-install.sh ]; then
   cd /var/lib
   yum install -y wget
-  wget https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/vmr-install.sh
+  wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
   chmod +x /var/lib/vmr-install.sh
   /var/lib/vmr-install.sh -i <link to VMR Docker Image>
 fi
@@ -38,7 +38,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Authors
 
-See the list of [contributors](https://github.com/KenBarr/solace-gcp-quickstart/graphs/contributors) who participated in this project.
+See the list of [contributors](https://github.com/SolaceLabs/solace-gcp-quickstart/graphs/contributors) who participated in this project.
 
 ## License
 
