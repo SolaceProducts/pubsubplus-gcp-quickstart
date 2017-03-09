@@ -6,6 +6,7 @@ key="$1"
 IMAGE=
 USERNAME=admin
 PASSWORD=admin
+LOG_FILE=install.log
 
 case $key in
     -u|--username)
@@ -27,7 +28,7 @@ esac
 shift # past argument or value
 done
 
-echo "`date` Validate we have been passed a VMR image"
+echo "`date` Validate we have been passed a VMR image" &> ${LOG_FILE}
 # -----------------------------------------------------
 if [ -z "$IMAGE" ]
 then
@@ -38,13 +39,13 @@ else
 fi
 
 
-echo "`date` Get repositories up to date"
+echo "`date` Get repositories up to date" &> ${LOG_FILE}
 # ---------------------------------------
 
-yum -y update
-yum -y install lvm2
+yum -y update &> ${LOG_FILE}
+yum -y install lvm2 &> ${LOG_FILE}
 
-echo "`date` Set up Docker Repository"
+echo "`date` Set up Docker Repository" &> ${LOG_FILE}
 # -----------------------------------
 tee /etc/yum.repos.d/docker.repo <<-EOF
 [dockerrepo]
@@ -54,37 +55,49 @@ enabled=1
 gpgcheck=1
 gpgkey=https://yum.dockerproject.org/gpg
 EOF
+echo "/etc/yum.repos.d/docker.repo =/n `cat /etc/yum.repos.d/docker.repo`" 
 
-echo "`date` Intall Docker"
+echo "`date` Intall Docker" &> ${LOG_FILE}
 # -------------------------
-yum -y install docker-engine
+yum -y install docker-engine &> ${LOG_FILE}
 
-echo "`date` Configure Docker as a service"
+echo "`date` Configure Docker as a service" &> ${LOG_FILE}
 # ----------------------------------------
-mkdir /etc/systemd/system/docker.service.d
+mkdir /etc/systemd/system/docker.service.d &> install.log
 tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF 
 [Service] 
   ExecStart= 
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper 
 EOF
+echo "/etc/systemd/system/docker.service.d =/n `cat /etc/systemd/system/docker.service.d`" 
 
-systemctl enable docker 
-systemctl start docker
+systemctl enable docker &> ${LOG_FILE} 
+systemctl start docker &> ${LOG_FILE}
 
-echo "`date` Pre-Define Solace required infrastructure"
+echo "`date` Set up swap for 4GB machines"
+# ----------------------------------------
+mkdir /var/lib/solace  &> ${LOG_FILE}
+fallocate /var/lib/solace/swap -l 2G &> ${LOG_FILE}
+mkswap -f /var/lib/solace/swap &> ${LOG_FILE}
+chmod 0600 /var/lib/solace/swap &> ${LOG_FILE}
+swapon -f /var/lib/solace/swap &> ${LOG_FILE}
+
+echo "`date` Pre-Define Solace required infrastructure" &> ${LOG_FILE}
 # -----------------------------------------------------
-docker volume create --name=jail 
-docker volume create --name=var 
-docker volume create --name=internalSpool 
-docker volume create --name=adbBackup 
-docker volume create --name=softAdb
+docker volume create --name=jail  &> ${LOG_FILE}
+docker volume create --name=var  &> ${LOG_FILE}
+docker volume create --name=internalSpool  &> ${LOG_FILE}
+docker volume create --name=adbBackup  &> ${LOG_FILE}
+docker volume create --name=softAdb &> ${LOG_FILE}
 
-echo "`date` Get and load the Solace Docker image"
+echo "`date` Get and load the Solace Docker image" &> ${LOG_FILE}
 # ------------------------------------------------
-wget ${IMAGE}
-docker load -i soltr*docker.tar.gz
+wget ${IMAGE}  &> ${LOG_FILE}
+docker load -i soltr*docker.tar.gz  &> ${LOG_FILE}
+docker images &> ${LOG_FILE}
 
-echo "`date` Create a Docker instance from Solace Docker image"
+
+echo "`date` Create a Docker instance from Solace Docker image" &> ${LOG_FILE}
 # -------------------------------------------------------------
 VMR_VERSION=`docker images | egrep -o [0-9\.]*vmr_docker[\-\.0-9a-z]*`
 
@@ -99,9 +112,11 @@ docker create \
  -v softAdb:/usr/sw/internalSpool/softAdb \
  --env 'username_admin_globalaccesslevel=admin' \
  --env 'username_admin_password=admin' \
- --name=solace solace-app:${VMR_VERSION}
+ --name=solace solace-app:${VMR_VERSION} &> ${LOG_FILE}
 
-echo "`date` Construct systemd for VMR"
+docker ps -a &> ${LOG_FILE}
+
+echo "`date` Construct systemd for VMR" &> ${LOG_FILE}
 # --------------------------------------
 tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Unit]
@@ -115,9 +130,10 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Install]
   WantedBy=default.target
 EOF
+echo "/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" 
 
 echo "`date` Start the VMR"
 # --------------------------
-systemctl daemon-reload
-systemctl enable solace-docker-vmr
-systemctl start solace-docker-vmr
+systemctl daemon-reload &> ${LOG_FILE}
+systemctl enable solace-docker-vmr &> ${LOG_FILE}
+systemctl start solace-docker-vmr &> ${LOG_FILE}

@@ -23,12 +23,13 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 
 ```
 #!/bin/bash
-if [ ! -f /var/lib/vmr-install.sh ]; then
-  cd /var/lib
+if [ ! -f /var/lib/solace ]; then
+  mkdir /var/lib/solace
+  cd /var/lib/solace
   yum install -y wget
   wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
-  chmod +x /var/lib/vmr-install.sh
-  /var/lib/vmr-install.sh -i <link to VMR Docker Image>
+  chmod +x /var/lib/solace/vmr-install.sh
+  /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image>
 fi
 ```
 
