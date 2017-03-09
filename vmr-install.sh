@@ -82,7 +82,7 @@ docker volume create --name=softAdb
 echo "`date` Get and load the Solace Docker image"
 # ------------------------------------------------
 wget ${IMAGE}
-docker load -i ${IMAGE}
+docker load -i soltr*docker.tar.gz
 
 echo "`date` Create a Docker instance from Solace Docker image"
 # -------------------------------------------------------------
