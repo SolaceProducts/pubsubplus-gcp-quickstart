@@ -1,4 +1,4 @@
-# Install a Solace Message Router onto a Linux Virtual Machine using Docker and Custom Extensions
+# Install a Solace Message Router onto a Google Compute Engine Linux Virtual Machine
 
 The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds. 
 
@@ -12,12 +12,13 @@ This is a 3 step process:
 </a>
 
 2. Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GByte of memory and Centos7 OS:
+
 ![alt text](https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
 
-3. Exposnd the the Management tab to expose the Automation Startup script panel
+3. Expand the the Management tab to expose the Automation Startup script panel
 ![alt text](https://raw.githubusercontent.com/KenBarr/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the code into the panel, replace <link to VMR Docker Image> with tyhe link you recieved in step one.
+Cut and paste the code into the panel, replace -link to VMR Docker Image- with the link you recieved in step one.
 
 ```
 #!/bin/bash
@@ -29,10 +30,6 @@ if [ ! -f /var/lib/vmr-install.sh ]; then
   /var/lib/vmr-install.sh -i <link to VMR Docker Image>
 fi
 ```
-
-## Use the custom image
-1. Create and instance based off of custom image with 2 CPU and 6GB memory, and 30GB disk space.
-2. Set security rules allow desired protocol access
 
 ## Contributing
 
