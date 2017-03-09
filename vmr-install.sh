@@ -97,8 +97,8 @@ docker create \
  -v internalSpool:/usr/sw/internalSpool \
  -v adbBackup:/usr/sw/adb \
  -v softAdb:/usr/sw/internalSpool/softAdb \
- --env 'username_admin_globalaccesslevel=${USERNAME}' \
- --env 'username_admin_password=${PASSWORD}' \
+ --env "username_admin_globalaccesslevel=${USERNAME} "\
+ --env "username_admin_password=${PASSWORD}" \
  --name=solace solace-app:${VMR_VERSION}
 
 echo "`date` Construct systemd for VMR"
