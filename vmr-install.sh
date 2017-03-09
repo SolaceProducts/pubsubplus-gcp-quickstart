@@ -79,8 +79,9 @@ docker volume create --name=internalSpool
 docker volume create --name=adbBackup 
 docker volume create --name=softAdb
 
-echo "`date` Load the Solace Docker image"
-# ----------------------------------------
+echo "`date` Get and load the Solace Docker image"
+# ------------------------------------------------
+wget ${IMAGE}
 docker load -i ${IMAGE}
 
 echo "`date` Create a Docker instance from Solace Docker image"
