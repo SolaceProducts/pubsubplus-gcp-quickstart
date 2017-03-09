@@ -83,7 +83,7 @@ dd if=/dev/zero of=${SOLACE_HOME}/${SWAP_FILE} count=2048 bs=1MiB &>> ${LOG_FILE
 mkswap -f ${SOLACE_HOME}/${SWAP_FILE} &>> ${LOG_FILE}
 chmod 0600 ${SOLACE_HOME}/${SWAP_FILE} &>> ${LOG_FILE}
 swapon -f ${SOLACE_HOME}/${SWAP_FILE} &>> ${LOG_FILE}
-echo "${SOLACE_HOME}/${SWAP_FILE} swap swap sw 0 0" >> /etc/fstab
+echo "${SOLACE_HOME}/${SWAP_FILE} none swap sw 0 0" >> /etc/fstab
 
 echo "`date` Pre-Define Solace required infrastructure" &>> ${LOG_FILE}
 # -----------------------------------------------------
