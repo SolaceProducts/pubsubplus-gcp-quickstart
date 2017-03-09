@@ -44,8 +44,8 @@ fi
 echo "`date` Get repositories up to date" &>> ${LOG_FILE}
 # ---------------------------------------
 
-yum -y update &> ${LOG_FILE}
-yum -y install lvm2 &> ${LOG_FILE}
+yum -y update &>> ${LOG_FILE}
+yum -y install lvm2 &>> ${LOG_FILE}
 
 echo "`date` Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------
@@ -57,7 +57,7 @@ enabled=1
 gpgcheck=1
 gpgkey=https://yum.dockerproject.org/gpg
 EOF
-echo "/etc/yum.repos.d/docker.repo =/n `cat /etc/yum.repos.d/docker.repo`" 
+echo "/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`" 
 
 echo "`date` Intall Docker" &>> ${LOG_FILE}
 # -------------------------
@@ -65,20 +65,19 @@ yum -y install docker-engine &>> ${LOG_FILE}
 
 echo "`date` Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
-mkdir /etc/systemd/system/docker.service.d &> install.log
+mkdir /etc/systemd/system/docker.service.d &>> install.log
 tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF 
 [Service] 
   ExecStart= 
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper 
 EOF
-echo "/etc/systemd/system/docker.service.d =/n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
+echo "/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
 
 systemctl enable docker &>> ${LOG_FILE}
 systemctl start docker &>> ${LOG_FILE}
 
 echo "`date` Set up swap for 4GB machines"
 # ----------------------------------------
-mkdir ${SOLACE_HOME} &>> ${LOG_FILE}
 dd if=/dev/zero of=${SOLACE_HOME}/${SWAP_FILE} count=2048 bs=1MiB &>> ${LOG_FILE}
 mkswap -f ${SOLACE_HOME}/${SWAP_FILE} &>> ${LOG_FILE}
 chmod 0600 ${SOLACE_HOME}/${SWAP_FILE} &>> ${LOG_FILE}
@@ -95,7 +94,7 @@ docker volume create --name=softAdb &>> ${LOG_FILE}
 
 echo "`date` Get and load the Solace Docker image" &>> ${LOG_FILE}
 # ------------------------------------------------
-wget ${IMAGE} &>> ${LOG_FILE}
+wget -nv -a ${LOG_FILE} ${IMAGE}
 docker load -i soltr*docker.tar.gz &>> ${LOG_FILE}
 docker images &>> ${LOG_FILE}
 
