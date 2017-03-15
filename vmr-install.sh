@@ -101,7 +101,7 @@ docker images &>> ${LOG_FILE}
 
 echo "`date` Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
-VMR_VERSION=`docker images | egrep -o [0-9\.]*vmr_docker[\-\.0-9a-z]*`
+VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
 
 docker create \
  --privileged=true \
