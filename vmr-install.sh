@@ -96,7 +96,7 @@ echo "`date` Get and load the Solace Docker url" &>> ${LOG_FILE}
 # ------------------------------------------------
 wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
 REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
-wget -O /tmp/soltr-docker.tar.gz ${REAL_HTML}
+wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
 docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
 docker images &>> ${LOG_FILE}
 
