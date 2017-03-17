@@ -29,7 +29,7 @@ if [ ! -f /var/lib/solace ]; then
   yum install -y wget
   wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
   chmod +x /var/lib/solace/vmr-install.sh
-  /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image>
+  /var/lib/solace/vmr-install.sh -u <link to VMR Docker Image>
 fi
 ```
 
