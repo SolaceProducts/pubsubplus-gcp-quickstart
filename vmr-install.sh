@@ -3,7 +3,7 @@
 while [[ $# -gt 1 ]]
 do
 key="$1"
-IMAGE=
+URL=
 USERNAME=admin
 PASSWORD=admin
 LOG_FILE=install.log
@@ -19,7 +19,7 @@ case $key in
       PASSWORD="$2"
       shift # past argument
     ;;
-    -u|--url)
+    -i|--url)
       URL="$2"
       shift # past argument
     ;;
