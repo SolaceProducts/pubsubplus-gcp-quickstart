@@ -19,8 +19,8 @@ case $key in
       PASSWORD="$2"
       shift # past argument
     ;;
-    -i|--image)
-      IMAGE="$2"
+    -u|--url)
+      URL="$2"
       shift # past argument
     ;;
     *)
@@ -30,14 +30,14 @@ esac
 shift # past argument or value
 done
 
-echo "`date` Validate we have been passed a VMR image" &>> ${LOG_FILE}
+echo "`date` Validate we have been passed a VMR url" &>> ${LOG_FILE}
 # -----------------------------------------------------
-if [ -z "$IMAGE" ]
+if [ -z "$URL" ]
 then
-      echo "USAGE: vmr-install.sh --image <Solace Docker Image>"
+      echo "USAGE: vmr-install.sh --url <Solace Docker URL>"
       echo 1
 else
-      echo "`date` VMR Image is ${IMAGE}"
+      echo "`date` VMR URL is ${URL}"
 fi
 
 
@@ -92,10 +92,12 @@ docker volume create --name=internalSpool &>> ${LOG_FILE}
 docker volume create --name=adbBackup &>> ${LOG_FILE}
 docker volume create --name=softAdb &>> ${LOG_FILE}
 
-echo "`date` Get and load the Solace Docker image" &>> ${LOG_FILE}
+echo "`date` Get and load the Solace Docker url" &>> ${LOG_FILE}
 # ------------------------------------------------
-wget -nv -a ${LOG_FILE} ${IMAGE}
-docker load -i soltr*docker.tar.gz &>> ${LOG_FILE}
+wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
+REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
+wget -O /tmp/soltr-docker.tar.gz ${REAL_HTML}
+docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
 docker images &>> ${LOG_FILE}
 
 

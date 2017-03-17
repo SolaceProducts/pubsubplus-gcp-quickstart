@@ -5,7 +5,7 @@ The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capa
 # How to Deploy a VMR
 This is a 3 step process:
 
-* Go to the Solace Developer portal and request a Solace Comunity edition VMR. This process will return an email with a Download link.
+* Go to the Solace Developer portal and request a Solace Comunity edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
     <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
@@ -19,7 +19,7 @@ This is a 3 step process:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the code into the panel, replace -link to VMR Docker Image- with the link you recieved in step one.
+Cut and paste the code into the panel, replace -link to VMR Docker URL- with the URL you recieved in step one.
 
 ```
 #!/bin/bash
