@@ -106,17 +106,24 @@ echo "`date` Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
 
 docker create \
- --privileged=true \
- --shm-size 2g \
- --net=host \
- -v jail:/usr/sw/jail \
- -v var:/usr/sw/var \
- -v internalSpool:/usr/sw/internalSpool \
- -v adbBackup:/usr/sw/adb \
- -v softAdb:/usr/sw/internalSpool/softAdb \
- --env 'username_admin_globalaccesslevel=admin' \
- --env 'username_admin_password=admin' \
- --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
+   --uts=host \
+   --shm-size 2g \
+   --ulimit core=-1 \
+   --ulimit memlock=-1 \
+   --ulimit nofile=2448:38048 \
+   --cap-add=IPC_LOCK \
+   --cap-add=SYS_NICE \
+   --net=host \
+   --restart=always \
+   -v jail:/usr/sw/jail \
+   -v var:/usr/sw/var \
+   -v internalSpool:/usr/sw/internalSpool \
+   -v adbBackup:/usr/sw/adb \
+   -v softAdb:/usr/sw/internalSpool/softAdb \
+   --env "username_admin_globalaccesslevel=admin" \
+   --env "username_admin_password=${PASSWORD}" \
+   --env "SERVICE_SSH_PORT=2222" \
+   --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
 
 docker ps -a &>> ${LOG_FILE}
 
