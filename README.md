@@ -28,7 +28,19 @@ if [ ! -f /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
   yum install -y wget
-  wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
+  LOOP_COUNT=0
+  while [ $LOOP_COUNT -lt 3 ]; do
+    wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
+    if [ 0 != `echo $?` ]; then 
+      ((LOOP_COUNT++))
+    else
+      break
+    fi
+  done
+  if [ ${LOOP_COUNT} == 3 ]; then
+    echo "`date` ERROR: Failed to download initial install script exiting"
+    exit 1
+  fi
   chmod +x /var/lib/solace/vmr-install.sh
   /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
 fi

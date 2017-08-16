@@ -100,7 +100,21 @@ echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
 # ------------------------------------------------
 wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
 REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
-wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
+
+LOOP_COUNT=0
+while [ $LOOP_COUNT -lt 3 ]; do
+  wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
+  if [ 0 != `echo $?` ]; then 
+    ((LOOP_COUNT++))
+  else
+    break
+  fi
+done
+if [ ${LOOP_COUNT} == 3 ]; then
+  echo "`date` ERROR: Failed to download VMR Docker image exiting"
+  exit 1
+fi
+
 docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
 docker images &>> ${LOG_FILE}
 
