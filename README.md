@@ -5,13 +5,14 @@ The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capa
 # How to Deploy a VMR
 This is a 3 step process:
 
-* Go to the Solace Developer portal and request a Solace Comunity edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This will be needed in the following section.
+* Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
     <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
 </a>
 
-* Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GByte of memory and Centos7 OS:
+* Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GB of memory, a CentOS 7 OS, and a disk with a
+size of at least 30 GB depolyed on Centos7 OS:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
 
@@ -19,7 +20,7 @@ This is a 3 step process:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the code into the panel, replace -link to VMR Docker URL- with the URL you recieved in step one.
+Cut and paste the code into the panel, replace -link to VMR Docker Image- with the URL you received in step one.
 
 ```
 #!/bin/bash
@@ -29,31 +30,32 @@ if [ ! -f /var/lib/solace ]; then
   yum install -y wget
   wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
   chmod +x /var/lib/solace/vmr-install.sh
-  /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image>
+  /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
 fi
 ```
 
 # Set up network security to allow access
-Now that the VMR is instantated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the networking->firewall tab add a new rule to your project exposing the required ports:
+Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_network.png "GCE Firewall rules")
 
 For more information on the ports required for the message router see the [configuration defaults](http://docs.solace.com/Solace-VMR-Set-Up/VMR-Configuration-Defaults.htm)
-For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls)
+. For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls)
 
 # Gaining admin access to the VMR
 
 For persons used to working with Solace message router console access, this is still available with the google compute engine instance.  Access the web ssh terminal window by clicking the [ssh] button next to your VMR instance,  then launch a SolOS cli session:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_console.png "GCE console with SolOS cli")
+`sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A`
 
-For persons who are unfamiliar with the Solace mesage router or would prefer an administration application the SolAdmin managmanent application is available.  For more information on SolAdmin see the [SolAdmin page](http://dev.solace.com/tech/soladmin/).  To get SolAdmin, visit the Solace [download page](http://dev.solace.com/downloads/) and select OS version desired.  Access IP will be the External IP accosiated with youe GCE instance and port will be 8080 by default.
+For persons who are unfamiliar with the Solace mesage router or would prefer an administration application the SolAdmin management application is available.  For more information on SolAdmin see the [SolAdmin page](http://dev.solace.com/tech/soladmin/).  To get SolAdmin, visit the Solace [download page](http://dev.solace.com/downloads/) and select OS version desired.  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_soladmin.png "soladmin connection to gce")
 
 # Testing data access to the VMR
 
-To test data traffic though the newly created VMR instance, visit the Solace developer portal and and select your prefered programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
+To test data traffic though the newly created VMR instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/solace_tutorial.png "getting started publish/subscribe")
 
