@@ -51,11 +51,11 @@ Now hit the "Create" button on the bottom of this page or add some VMR config ke
 # Initializing-Config-Keys-With-Cloud-Init
 You can use VMR configuration keys to initialise your VMR. All keys introduced with v8.4 are supported except for service_semp_port, username&lowbar;&lt;name&gt;&lowbar;... and interface&lowbar;&lt;ip&lowbar;intf&gt;&lowbar;. . .
 see [Initializing-Config-Keys-With-Cloud-Init]( http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm) for a full list.  
-To initialise your VMR with HA group configuration, set the additional variable baseroutername to the base name of your choosing for all 3 VMRs and follow the following naming convention for your VMRs (and config keys):
-- monitor node = baseroutername-0
-- primary node = baseroutername-1
-- backup node  = baseroutername-2
-
+To initialise your VMR with HA group configuration, set the additional variable baseroutername to the base name of your choosing for all 3 VMRs and follow the following naming convention for your VMRs (and config keys).
+- monitor node = baseroutername_0
+- primary node = baseroutername_1
+- backup node  = baseroutername_2
+Refrain from using hyphens in your baseroutername as this will break!
 
 
 # Set up network security to allow access
