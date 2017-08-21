@@ -6,6 +6,10 @@ PASSWORD=admin
 LOG_FILE=install.log
 SWAP_FILE=swap
 SOLACE_HOME=`pwd`
+#cloud init vars
+#array of all available cloud init variables to attempt to detect and pass to docker image creation
+#see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
+cloud_init_vars=( routername nodetype service_semp_port system_scaling_maxconnectioncount configsync_enable redundancy_activestandbyrole redundancy_enable redundancy_group_password redundancy_matelink_connectvia service_redundancy_firstlistenport )
 
 while [[ $# -gt 1 ]]
 do
@@ -101,36 +105,40 @@ echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
 wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
 REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
 
-LOOP_COUNT=0
-while [ $LOOP_COUNT -lt 3 ]; do
-  wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
-  if [ 0 != `echo $?` ]; then
-    ((LOOP_COUNT++))
-  else
-    break
+if [ ! -f /tmp/soltr-docker.tar.gz ]; then
+  LOOP_COUNT=0
+  while [ $LOOP_COUNT -lt 3 ]; do
+    wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
+    if [ 0 != `echo $?` ]; then
+      ((LOOP_COUNT++))
+    else
+      break
+    fi
+  done
+  if [ ${LOOP_COUNT} == 3 ]; then
+    echo "`date` ERROR: Failed to download VMR Docker image exiting"
+    exit 1
   fi
-done
-if [ ${LOOP_COUNT} == 3 ]; then
-  echo "`date` ERROR: Failed to download VMR Docker image exiting"
-  exit 1
+
+  docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
+  docker images &>> ${LOG_FILE}
 fi
-
-docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
-docker images &>> ${LOG_FILE}
-
 
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
 VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
-routername="mytestvmrhtf"
 
-SOLACE_CLOUD_INIT=" --env \"SERVICE_SSH_PORT=2222\" "
-[ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env \"username_admin_globalaccesslevel=${USERNAME}\""
-[ ! -z "${PASSWORD}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env \"username_admin_password=${PASSWORD}\""
-[ ! -z "${routername}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env \"routername=${routername}\""
+SOLACE_CLOUD_INIT="--env SERVICE_SSH_PORT=2222"
+[ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_globalaccesslevel=${USERNAME}"
+[ ! -z "${PASSWORD}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_password=${PASSWORD}"
+for var_name in "${cloud_init_vars[@]}"; do
+  [ ! -z ${!var_name} ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env $var_name=${!var_name}"
+done
 
 echo "SOLACE_CLOUD_INIT set to:" | tee -a ${LOG_FILE}
 echo ${SOLACE_CLOUD_INIT} | tee -a ${LOG_FILE}
+exit 0
+
 
 docker create \
    --uts=host \
