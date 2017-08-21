@@ -68,6 +68,14 @@ For persons who are unfamiliar with the Solace mesage router or would prefer an 
 
 ![alt text](https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/master/images/gce_soladmin.png "soladmin connection to gce")
 
+# Initializing-Config-Keys-With-Cloud-Init
+You can use vmr configuration keys to initialise your VMR. All keys introduced with v8.4 are supported except for service_semp_port, username_<name>_... and interface_<ip_intf>_... .
+(see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm )
+To initialise your VMR with HA group, set additional variable baseroutername and follow the following naming convention for your VMRs:
+monitor node = baseroutername-0
+primary node = baseroutername-1
+backup node  = baseroutername-2
+
 # Testing data access to the VMR
 
 To test data traffic though the newly created VMR instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
