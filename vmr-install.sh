@@ -11,6 +11,15 @@ SOLACE_HOME=`pwd`
 #see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
 cloud_init_vars=( routername nodetype service_semp_port system_scaling_maxconnectioncount configsync_enable redundancy_activestandbyrole redundancy_enable redundancy_group_password redundancy_matelink_connectvia service_redundancy_firstlistenport )
 
+if [ ! -z "${baseroutername}" ]; then
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}-0_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}-0_connectvia )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}-1_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}-1_connectvia )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}-2_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}-2_connectvia )
+fi
+
 while [[ $# -gt 1 ]]
 do
   key="$1"
