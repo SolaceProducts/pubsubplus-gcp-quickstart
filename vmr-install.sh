@@ -122,9 +122,15 @@ docker images &>> ${LOG_FILE}
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
 VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
+routername="mytestvmrhtf"
 
-SOLACE_CLOUD_INIT=''
-[ ! -z "${USERNAME}" ] || echo "username is set" | tee ${LOG_FILE}
+SOLACE_CLOUD_INIT=" --env \"SERVICE_SSH_PORT=2222\" "
+[ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env \"username_admin_globalaccesslevel=${USERNAME}\""
+[ ! -z "${PASSWORD}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env \"username_admin_password=${PASSWORD}\""
+[ ! -z "${routername}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env \"routername=${routername}\""
+
+echo "SOLACE_CLOUD_INIT set to:" | tee -a ${LOG_FILE}
+echo ${SOLACE_CLOUD_INIT} | tee -a ${LOG_FILE}
 
 docker create \
    --uts=host \
@@ -136,9 +142,7 @@ docker create \
    --cap-add=SYS_NICE \
    --net=host \
    --restart=always \
-   --env "username_admin_globalaccesslevel=${USERNAME}" \
-   --env "username_admin_password=${PASSWORD}" \
-   --env "SERVICE_SSH_PORT=2222" \
+   ${SOLACE_CLOUD_INIT} \
    --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
 
 docker ps -a &>> ${LOG_FILE}
