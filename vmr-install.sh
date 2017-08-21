@@ -146,8 +146,6 @@ done
 
 echo "SOLACE_CLOUD_INIT set to:" | tee -a ${LOG_FILE}
 echo ${SOLACE_CLOUD_INIT} | tee -a ${LOG_FILE}
-exit 0
-
 
 docker create \
    --uts=host \
