@@ -46,7 +46,17 @@ if [ ! -f /var/lib/solace ]; then
 fi
 ```
 
-Now hit the "Create" button on the bottom of this page.
+Now hit the "Create" button on the bottom of this page or add some VMR config keys before you do.
+
+# Initializing-Config-Keys-With-Cloud-Init
+You can use vmr configuration keys to initialise your VMR. All keys introduced with v8.4 are supported except for service_semp_port, username&lowbar;&lt;name&gt;&lowbar;... and interface&lowbar;&lt;ip&lowbar;intf&gt;&lowbar;. . .
+see [Initializing-Config-Keys-With-Cloud-Init]( http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm) for a full list.  
+To initialise your VMR with HA group, set additional variable baseroutername and follow the following naming convention for your VMRs:
+- monitor node = baseroutername-0
+- primary node = baseroutername-1
+- backup node  = baseroutername-2
+
+
 
 # Set up network security to allow access
 Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
@@ -67,14 +77,6 @@ For persons used to working with Solace message router console access, this is s
 For persons who are unfamiliar with the Solace mesage router or would prefer an administration application the SolAdmin management application is available.  For more information on SolAdmin see the [SolAdmin page](http://dev.solace.com/tech/soladmin/).  To get SolAdmin, visit the Solace [download page](http://dev.solace.com/downloads/) and select OS version desired.  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
 
 ![alt text](https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/master/images/gce_soladmin.png "soladmin connection to gce")
-
-# Initializing-Config-Keys-With-Cloud-Init
-You can use vmr configuration keys to initialise your VMR. All keys introduced with v8.4 are supported except for service_semp_port, username_<name>_... and interface_<ip_intf>_... .
-(see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm )
-To initialise your VMR with HA group, set additional variable baseroutername and follow the following naming convention for your VMRs:
-monitor node = baseroutername-0
-primary node = baseroutername-1
-backup node  = baseroutername-2
 
 # Testing data access to the VMR
 
