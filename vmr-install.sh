@@ -70,10 +70,10 @@ yum -y install docker-engine &>> ${LOG_FILE}
 echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
 mkdir /etc/systemd/system/docker.service.d &>> install.log
-tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF 
-[Service] 
-  ExecStart= 
-  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper 
+tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
+[Service]
+  ExecStart=
+  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
 echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
 
@@ -104,7 +104,7 @@ REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
 LOOP_COUNT=0
 while [ $LOOP_COUNT -lt 3 ]; do
   wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
-  if [ 0 != `echo $?` ]; then 
+  if [ 0 != `echo $?` ]; then
     ((LOOP_COUNT++))
   else
     break
@@ -122,6 +122,9 @@ docker images &>> ${LOG_FILE}
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
 VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
+
+SOLACE_CLOUD_INIT=''
+[ ! -z "${USERNAME}" ] || echo "username is set" | tee ${LOG_FILE}
 
 docker create \
    --uts=host \
@@ -154,7 +157,7 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Install]
   WantedBy=default.target
 EOF
-echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" &>> ${LOG_FILE} 
+echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" &>> ${LOG_FILE}
 
 echo "`date` INFO: Start the VMR"
 # --------------------------
