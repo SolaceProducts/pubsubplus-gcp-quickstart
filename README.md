@@ -24,6 +24,51 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 
 ```
 #!/bin/bash
+###(optional) to set any config keys edit and uncomment the appropriate section
+### for the vmr role you are about to configure
+##These are example values for configuring a monitoring node
+#export baseroutername=gcevmr
+#export nodetype=monitoring
+#export routername=gcevmr0
+#export redundancy_enable=\"yes\"
+#export redundancy_group_password=gruyerecheese
+#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
+#export redundancy_group_node_gcevmr0_nodetype=monitoring
+#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
+#export redundancy_group_node_gcevmr1_nodetype=message_routing
+#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
+#export redundancy_group_node_gcevmr2_nodetype=message_routing
+##These are example values for configuring a primary node
+#export baseroutername=gcevmr
+#export nodetype=message_routing
+#export routername=gcevmr1
+#export configsync_enable=\"yes\"
+#export redundancy_activestandbyrole=primary
+#export redundancy_enable=\"yes\"
+#export redundancy_group_password=gruyerecheese
+#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
+#export redundancy_group_node_gcevmr0_nodetype=monitoring
+#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
+#export redundancy_group_node_gcevmr1_nodetype=message_routing
+#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
+#export redundancy_group_node_gcevmr2_nodetype=message_routing
+#export redundancy_matelink_connectvia=10.154.0.3
+##These are example values for configuring a backup node
+#export baseroutername=gcevmr
+#export nodetype=message_routing
+#export routername=gcevmr2
+#export configsync_enable=\"yes\"
+#export redundancy_activestandbyrole=backup
+#export redundancy_enable=\"yes\"
+#export redundancy_group_password=gruyerecheese
+#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
+#export redundancy_group_node_gcevmr0_nodetype=monitoring
+#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
+#export redundancy_group_node_gcevmr1_nodetype=message_routing
+#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
+#export redundancy_group_node_gcevmr2_nodetype=message_routing
+#export redundancy_matelink_connectvia=10.154.0.2
+###
 if [ ! -f /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
@@ -48,7 +93,7 @@ fi
 
 Now hit the "Create" button on the bottom of this page or add some VMR config keys before you do.
 
-# Initializing-Config-Keys-With-Cloud-Init
+# Initializing config keys with Cloud-Init
 You can use VMR configuration keys to initialise your VMR. All keys introduced with v8.4 are supported except for service_semp_port, username&lowbar;&lt;name&gt;&lowbar;... and interface&lowbar;&lt;ip&lowbar;intf&gt;&lowbar;. . .
 see [Initializing-Config-Keys-With-Cloud-Init]( http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm) for a full list.  
 To initialise your VMR with HA group configuration, set the additional variable baseroutername to the base name of your choosing for all 3 VMRs and follow the following naming convention for your VMRs (and config keys).
