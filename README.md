@@ -55,7 +55,7 @@ To initialise your VMR with HA group configuration, set the additional variable 
 - monitor node = baseroutername_0
 - primary node = baseroutername_1
 - backup node  = baseroutername_2
-Refrain from using hyphens in your baseroutername as this will break!
+Please note that dashes or underscores are not allowed in your baseroutername or routername and the script will fail to find your config-keys, if you attempt to use them in your names!
 
 
 # Set up network security to allow access

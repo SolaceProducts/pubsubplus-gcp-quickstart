@@ -11,14 +11,27 @@ SOLACE_HOME=`pwd`
 #see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
 cloud_init_vars=( routername nodetype service_semp_port system_scaling_maxconnectioncount configsync_enable redundancy_activestandbyrole redundancy_enable redundancy_group_password redundancy_matelink_connectvia service_redundancy_firstlistenport )
 
-if [ ! -z "${baseroutername}" ]; then
-  cloud_init_vars+=( redundancy_group_node_${baseroutername}_0_nodetype )
-  cloud_init_vars+=( redundancy_group_node_${baseroutername}_0_connectvia )
-  cloud_init_vars+=( redundancy_group_node_${baseroutername}_1_nodetype )
-  cloud_init_vars+=( redundancy_group_node_${baseroutername}_1_connectvia )
-  cloud_init_vars+=( redundancy_group_node_${baseroutername}_2_nodetype )
-  cloud_init_vars+=( redundancy_group_node_${baseroutername}_2_connectvia )
+# check if routernames contain any dashes or underscores and abort execution, if that is the case.
+if [[ $routername == *"-"* || $routername == *"_"* || $baseroutername == *"-"* || $baseroutername == *"_"* ]]; then
+  echo "Dashes and underscores are not allowed in routername(s), aborting..." | tee -a ${LOG_FILE}
+  exit -1
 fi
+
+#remove all dashes and underscores from routernames
+#[ ! -z "${routername}" ] && routername=${routername/-/}
+#[ ! -z "${routername}" ] && routername=${routername/_/}
+#[ ! -z "${baseroutername}" ] && baseroutername=${baseroutername/-/}
+#[ ! -z "${baseroutername}" ] && baseroutername=${baseroutername/_/}
+
+if [ ! -z "${baseroutername}" ]; then
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}0_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}0_connectvia )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}1_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}1_connectvia )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}2_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}2_connectvia )
+fi
+
 
 while [[ $# -gt 1 ]]
 do
