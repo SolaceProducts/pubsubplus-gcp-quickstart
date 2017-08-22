@@ -30,7 +30,7 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 #export baseroutername=gcevmr
 #export nodetype=monitoring
 #export routername=gcevmr0
-#export redundancy_enable=\"yes\"
+#export redundancy_enable=yes
 #export redundancy_group_password=gruyerecheese
 #export redundancy_group_node_gcevmr0_connectvia=10.154.0.210
 #export redundancy_group_node_gcevmr0_nodetype=monitoring
@@ -42,9 +42,9 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 #export baseroutername=gcevmr
 #export nodetype=message_routing
 #export routername=gcevmr1
-#export configsync_enable=\"yes\"
+#export configsync_enable=yes
 #export redundancy_activestandbyrole=primary
-#export redundancy_enable=\"yes\"
+#export redundancy_enable=yes
 #export redundancy_group_password=gruyerecheese
 #export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
 #export redundancy_group_node_gcevmr0_nodetype=monitoring
@@ -57,9 +57,9 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 #export baseroutername=gcevmr
 #export nodetype=message_routing
 #export routername=gcevmr2
-#export configsync_enable=\"yes\"
+#export configsync_enable=yes
 #export redundancy_activestandbyrole=backup
-#export redundancy_enable=\"yes\"
+#export redundancy_enable=yes
 #export redundancy_group_password=gruyerecheese
 #export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
 #export redundancy_group_node_gcevmr0_nodetype=monitoring
