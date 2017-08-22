@@ -32,11 +32,11 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 #export routername=gcevmr0
 #export redundancy_enable=\"yes\"
 #export redundancy_group_password=gruyerecheese
-#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
+#export redundancy_group_node_gcevmr0_connectvia=10.154.0.210
 #export redundancy_group_node_gcevmr0_nodetype=monitoring
-#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
+#export redundancy_group_node_gcevmr1_connectvia=10.154.0.211
 #export redundancy_group_node_gcevmr1_nodetype=message_routing
-#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
+#export redundancy_group_node_gcevmr2_connectvia=10.154.0.212
 #export redundancy_group_node_gcevmr2_nodetype=message_routing
 ##These are example values for configuring a primary node
 #export baseroutername=gcevmr
@@ -90,6 +90,10 @@ if [ ! -f /var/lib/solace ]; then
   /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
 fi
 ```
+* If you are configuring 3 HA nodes, expand the the Network tab to edit the Network interface panel and customise your IP addresses. You need to pick 3 available IPs (same as you configure in your start-up script)
+
+![alt text](https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
+
 
 Now hit the "Create" button on the bottom of this page or add some VMR config keys before you do.
 
