@@ -6,6 +6,32 @@ PASSWORD=admin
 LOG_FILE=install.log
 SWAP_FILE=swap
 SOLACE_HOME=`pwd`
+#cloud init vars
+#array of all available cloud init variables to attempt to detect and pass to docker image creation
+#see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
+cloud_init_vars=( routername nodetype service_semp_port system_scaling_maxconnectioncount configsync_enable redundancy_activestandbyrole redundancy_enable redundancy_group_password redundancy_matelink_connectvia service_redundancy_firstlistenport )
+
+# check if routernames contain any dashes or underscores and abort execution, if that is the case.
+if [[ $routername == *"-"* || $routername == *"_"* || $baseroutername == *"-"* || $baseroutername == *"_"* ]]; then
+  echo "Dashes and underscores are not allowed in routername(s), aborting..." | tee -a ${LOG_FILE}
+  exit -1
+fi
+
+#remove all dashes and underscores from routernames
+#[ ! -z "${routername}" ] && routername=${routername/-/}
+#[ ! -z "${routername}" ] && routername=${routername/_/}
+#[ ! -z "${baseroutername}" ] && baseroutername=${baseroutername/-/}
+#[ ! -z "${baseroutername}" ] && baseroutername=${baseroutername/_/}
+
+if [ ! -z "${baseroutername}" ]; then
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}0_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}0_connectvia )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}1_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}1_connectvia )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}2_nodetype )
+  cloud_init_vars+=( redundancy_group_node_${baseroutername}2_connectvia )
+fi
+
 
 while [[ $# -gt 1 ]]
 do
@@ -70,10 +96,10 @@ yum -y install docker-engine &>> ${LOG_FILE}
 echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
 mkdir /etc/systemd/system/docker.service.d &>> install.log
-tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF 
-[Service] 
-  ExecStart= 
-  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper 
+tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
+[Service]
+  ExecStart=
+  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
 echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
 
@@ -101,27 +127,38 @@ echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
 wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
 REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
 
-LOOP_COUNT=0
-while [ $LOOP_COUNT -lt 3 ]; do
-  wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
-  if [ 0 != `echo $?` ]; then 
-    ((LOOP_COUNT++))
-  else
-    break
+if [ ! -f /tmp/soltr-docker.tar.gz ]; then
+  LOOP_COUNT=0
+  while [ $LOOP_COUNT -lt 3 ]; do
+    wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
+    if [ 0 != `echo $?` ]; then
+      ((LOOP_COUNT++))
+    else
+      break
+    fi
+  done
+  if [ ${LOOP_COUNT} == 3 ]; then
+    echo "`date` ERROR: Failed to download VMR Docker image exiting"
+    exit 1
   fi
-done
-if [ ${LOOP_COUNT} == 3 ]; then
-  echo "`date` ERROR: Failed to download VMR Docker image exiting"
-  exit 1
+
+  docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
+  docker images &>> ${LOG_FILE}
 fi
-
-docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
-docker images &>> ${LOG_FILE}
-
 
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
 VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
+
+SOLACE_CLOUD_INIT="--env SERVICE_SSH_PORT=2222"
+[ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_globalaccesslevel=${USERNAME}"
+[ ! -z "${PASSWORD}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_password=${PASSWORD}"
+for var_name in "${cloud_init_vars[@]}"; do
+  [ ! -z ${!var_name} ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env $var_name=${!var_name}"
+done
+
+echo "SOLACE_CLOUD_INIT set to:" | tee -a ${LOG_FILE}
+echo ${SOLACE_CLOUD_INIT} | tee -a ${LOG_FILE}
 
 docker create \
    --uts=host \
@@ -133,9 +170,7 @@ docker create \
    --cap-add=SYS_NICE \
    --net=host \
    --restart=always \
-   --env "username_admin_globalaccesslevel=${USERNAME}" \
-   --env "username_admin_password=${PASSWORD}" \
-   --env "SERVICE_SSH_PORT=2222" \
+   ${SOLACE_CLOUD_INIT} \
    --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
 
 docker ps -a &>> ${LOG_FILE}
@@ -154,7 +189,7 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Install]
   WantedBy=default.target
 EOF
-echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" &>> ${LOG_FILE} 
+echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" &>> ${LOG_FILE}
 
 echo "`date` INFO: Start the VMR"
 # --------------------------
