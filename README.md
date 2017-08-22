@@ -54,7 +54,7 @@ see [Initializing-Config-Keys-With-Cloud-Init]( http://docs.solace.com/Solace-VM
 To initialise your VMR with HA group configuration, set the additional variable baseroutername to the base name of your choosing for all 3 VMRs and follow the following naming convention for your VMRs (and config keys).
 - monitor node = baseroutername_0
 - primary node = baseroutername_1
-- backup node  = baseroutername_2
+- backup node  = baseroutername_2  
 Please note that dashes or underscores are not allowed in your baseroutername or routername and the script will fail to find your config-keys, if you attempt to use them in your names!
 
 
