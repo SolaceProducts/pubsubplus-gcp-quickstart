@@ -1,11 +1,11 @@
 # Install a Solace Message Router onto a Google Compute Engine Linux Virtual Machine
 
-The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds.
+The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds. 
 
 # How to Deploy a VMR
 This is a 3 step process:
 
-* Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is the form "  http://em.solace.com/ ? " will be needed in the following section.
+* Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is the form "http<nolink>://em.solace.com ?" will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
     <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
@@ -24,51 +24,6 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 
 ```
 #!/bin/bash
-###(optional) to set any config keys edit and uncomment the appropriate section
-### for the vmr role you are about to configure
-##These are example values for configuring a monitoring node
-#export baseroutername=gcevmr
-#export nodetype=monitoring
-#export routername=gcevmr0
-#export redundancy_enable=yes
-#export redundancy_group_password=gruyerecheese
-#export redundancy_group_node_gcevmr0_connectvia=10.154.0.210
-#export redundancy_group_node_gcevmr0_nodetype=monitoring
-#export redundancy_group_node_gcevmr1_connectvia=10.154.0.211
-#export redundancy_group_node_gcevmr1_nodetype=message_routing
-#export redundancy_group_node_gcevmr2_connectvia=10.154.0.212
-#export redundancy_group_node_gcevmr2_nodetype=message_routing
-##These are example values for configuring a primary node
-#export baseroutername=gcevmr
-#export nodetype=message_routing
-#export routername=gcevmr1
-#export configsync_enable=yes
-#export redundancy_activestandbyrole=primary
-#export redundancy_enable=yes
-#export redundancy_group_password=gruyerecheese
-#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
-#export redundancy_group_node_gcevmr0_nodetype=monitoring
-#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
-#export redundancy_group_node_gcevmr1_nodetype=message_routing
-#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
-#export redundancy_group_node_gcevmr2_nodetype=message_routing
-#export redundancy_matelink_connectvia=10.154.0.3
-##These are example values for configuring a backup node
-#export baseroutername=gcevmr
-#export nodetype=message_routing
-#export routername=gcevmr2
-#export configsync_enable=yes
-#export redundancy_activestandbyrole=backup
-#export redundancy_enable=yes
-#export redundancy_group_password=gruyerecheese
-#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
-#export redundancy_group_node_gcevmr0_nodetype=monitoring
-#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
-#export redundancy_group_node_gcevmr1_nodetype=message_routing
-#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
-#export redundancy_group_node_gcevmr2_nodetype=message_routing
-#export redundancy_matelink_connectvia=10.154.0.2
-###
 if [ ! -f /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
@@ -76,7 +31,7 @@ if [ ! -f /var/lib/solace ]; then
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
     wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
-    if [ 0 != `echo $?` ]; then
+    if [ 0 != `echo $?` ]; then 
       ((LOOP_COUNT++))
     else
       break
@@ -90,24 +45,8 @@ if [ ! -f /var/lib/solace ]; then
   /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
 fi
 ```
-* If you are configuring 3 HA nodes, expand the the Network tab to edit the Network interface panel and customise your IP addresses. You need to pick 3 available IPs (same as you configure in your start-up script)
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
-
-
-Now hit the "Create" button on the bottom of this page or add some VMR config keys before you do.
-
-# Initializing config keys with Cloud-Init
-You can use VMR configuration keys to initialise your VMR. All keys introduced with v8.4 are supported except for service_semp_port, username&lowbar;&lt;name&gt;&lowbar;... and interface&lowbar;&lt;ip&lowbar;intf&gt;&lowbar;. . .
-see [Initializing-Config-Keys-With-Cloud-Init]( http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm) for a full list.  
-To initialise your VMR with HA group configuration, set the additional variable baseroutername to the base name of your choosing for all 3 VMRs and follow the following naming convention for your VMRs (and config keys).
-- monitor node = ${baseroutername}0
-- primary node = ${baseroutername}1
-- backup node  = ${baseroutername}2
- 
-[All router names need to be based on the baseroutername followed by an index of 0, 1 or 2 as suffix]  
-Please note that dashes or underscores are not allowed in your baseroutername or routername and the script will fail to find your config-keys, if you attempt to use them in your names!
-
+Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the VMR.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to when the install has completed.
 
 # Set up network security to allow access
 Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
