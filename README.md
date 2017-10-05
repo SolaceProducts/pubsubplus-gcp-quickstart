@@ -69,7 +69,7 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 #export redundancy_group_node_gcevmr2_nodetype=message_routing
 #export redundancy_matelink_connectvia=10.154.0.2
 ###
-if [ ! -f /var/lib/solace ]; then
+if [ ! -d /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
   yum install -y wget
