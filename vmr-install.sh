@@ -208,5 +208,3 @@ echo "`date` INFO: Start the VMR"
 systemctl daemon-reload &>> ${LOG_FILE}
 systemctl enable solace-docker-vmr &>> ${LOG_FILE}
 systemctl start solace-docker-vmr &>> ${LOG_FILE}
-
-echo "`date` INFO: Install is complete"
