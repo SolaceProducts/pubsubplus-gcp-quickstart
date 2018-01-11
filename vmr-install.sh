@@ -121,6 +121,13 @@ else
    echo "`date` INFO: Memory size is ${MEM_SIZE}" &>> ${LOG_FILE}
 fi
 
+echo "`date` Pre-Define Solace required infrastructure" &>> ${LOG_FILE}
+# -----------------------------------------------------
+docker volume create --name=jail &>> ${LOG_FILE}
+docker volume create --name=var &>> ${LOG_FILE}
+docker volume create --name=internalSpool &>> ${LOG_FILE}
+docker volume create --name=adbBackup &>> ${LOG_FILE}
+docker volume create --name=softAdb &>> ${LOG_FILE}
 
 echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
 # ------------------------------------------------
@@ -170,6 +177,11 @@ docker create \
    --cap-add=SYS_NICE \
    --net=host \
    --restart=always \
+   -v jail:/usr/sw/jail \
+   -v var:/usr/sw/var \
+   -v internalSpool:/usr/sw/internalSpool \
+   -v adbBackup:/usr/sw/adb \
+   -v softAdb:/usr/sw/internalSpool/softAdb \
    ${SOLACE_CLOUD_INIT} \
    --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
 
