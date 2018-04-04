@@ -170,6 +170,11 @@ docker create \
    --cap-add=SYS_NICE \
    --net=host \
    --restart=always \
+   -v jail:/usr/sw/jail \
+   -v var:/usr/sw/var \
+   -v internalSpool:/usr/sw/internalSpool \
+   -v adbBackup:/usr/sw/adb \
+   -v softAdb:/usr/sw/internalSpool/softAdb \
    ${SOLACE_CLOUD_INIT} \
    --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
 
