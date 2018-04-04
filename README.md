@@ -1,11 +1,11 @@
 # Install a Solace Message Router onto a Google Compute Engine Linux Virtual Machine
 
-The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds.
+The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds. 
 
 # How to Deploy a VMR
 This is a 3 step process:
 
-* Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This will be needed in the following section.
+* Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
     <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
@@ -76,7 +76,7 @@ if [ ! -d /var/lib/solace ]; then
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
     wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
-    if [ 0 != `echo $?` ]; then
+    if [ 0 != `echo $?` ]; then 
       ((LOOP_COUNT++))
     else
       break
@@ -108,6 +108,7 @@ To initialise your VMR with HA group configuration, set the additional variable 
 [All router names need to be based on the baseroutername followed by an index of 0, 1 or 2 as suffix]  
 Please note that dashes or underscores are not allowed in your baseroutername or routername and the script will fail to find your config-keys, if you attempt to use them in your names!
 
+Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the VMR.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to indicate when the install has completed.
 
 # Set up network security to allow access
 Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:

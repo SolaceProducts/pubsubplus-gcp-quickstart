@@ -121,6 +121,13 @@ else
    echo "`date` INFO: Memory size is ${MEM_SIZE}" &>> ${LOG_FILE}
 fi
 
+echo "`date` Pre-Define Solace required infrastructure" &>> ${LOG_FILE}
+# -----------------------------------------------------
+docker volume create --name=jail &>> ${LOG_FILE}
+docker volume create --name=var &>> ${LOG_FILE}
+docker volume create --name=internalSpool &>> ${LOG_FILE}
+docker volume create --name=adbBackup &>> ${LOG_FILE}
+docker volume create --name=softAdb &>> ${LOG_FILE}
 
 echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
 # ------------------------------------------------
@@ -162,10 +169,10 @@ echo ${SOLACE_CLOUD_INIT} | tee -a ${LOG_FILE}
 
 docker create \
    --uts=host \
-   --shm-size 2g \
+   --shm-size 3g \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
-   --ulimit nofile=2448:38048 \
+   --ulimit nofile=2448:1048576 \
    --cap-add=IPC_LOCK \
    --cap-add=SYS_NICE \
    --net=host \
