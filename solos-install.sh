@@ -209,4 +209,4 @@ systemctl daemon-reload &>> ${LOG_FILE}
 systemctl enable solace-docker &>> ${LOG_FILE}
 systemctl start solace-docker &>> ${LOG_FILE}
 
-echo "`date` INFO: Install is complete"
+echo "`date` INFO: Install is complete" &>> ${LOG_FILE}

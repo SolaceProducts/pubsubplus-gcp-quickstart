@@ -6,7 +6,7 @@ The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capa
 
 * [Optional] By default this project installs the Solace PubSub+ software message router, Standard Edition.  If you want to install a different version you will have to provide link to version and accompanying md5sum files with the --url and --md5sum flags for solos-install.  Visit http://dev.solace.com/downloads/ to see options and read release notes to understand differences.
 
-* Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GB of memory, a CentOS 7 OS, and a disk with a
+* Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
@@ -59,9 +59,9 @@ For persons used to working with Solace message router console access, this is s
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_console.png "GCE console with SolOS cli")
 `sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A`
 
-For persons who are unfamiliar with the Solace mesage router or would prefer an administration application the SolAdmin management application is available.  For more information on SolAdmin see the [SolAdmin page](http://dev.solace.com/tech/soladmin/).  To get SolAdmin, visit the Solace [download page](http://dev.solace.com/downloads/) and select OS version desired.  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
+For persons who are unfamiliar with the Solace mesage router or would prefer an administration application, the imbedded PubSub+ Manager is available.  For more information on PubSub+ Manager see the [PubSub+ Manager page](https://docs.solace.com/Solace-PubSub-Manager/PubSub-Manager-Overview.htm).  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_soladmin.png "soladmin connection to gce")
+![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_webui.png " PubSub+ Manager connection to gce")
 
 # Testing data access to the VMR
 
