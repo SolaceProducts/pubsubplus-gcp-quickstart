@@ -3,13 +3,8 @@
 The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds. 
 
 # How to Deploy a VMR
-This is a 3 step process:
 
-* Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
-
-<a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
-    <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
-</a>
+* [Optional] By default this project installs the Solace PubSub+ software message router, Standard Edition.  If you want to install a different version you will have to provide link to version and accompanying md5sum files with the --url and --md5sum flags for solos-install.  Visit http://dev.solace.com/downloads/ to see options and read release notes to understand differences.
 
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
@@ -30,7 +25,7 @@ if [ ! -f /var/lib/solace ]; then
   yum install -y wget
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
+    wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/solos-install.sh
     if [ 0 != `echo $?` ]; then 
       ((LOOP_COUNT++))
     else
@@ -41,8 +36,8 @@ if [ ! -f /var/lib/solace ]; then
     echo "`date` ERROR: Failed to download initial install script exiting"
     exit 1
   fi
-  chmod +x /var/lib/solace/vmr-install.sh
-  /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
+  chmod +x /var/lib/solace/solos-install.sh
+  /var/lib/solace/solos-install.sh -p <SolOS/SolAdmin password>
 fi
 ```
 

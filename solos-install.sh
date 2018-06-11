@@ -1,6 +1,7 @@
 #!/bin/bash
 
-URL=""
+URL="https://products.solace.com/download/PUBSUB_DOCKER_STAND"
+MD5SUM="https://products.solace.com/download/PUBSUB_DOCKER_STAND_MD5"
 USERNAME=admin
 PASSWORD=admin
 LOG_FILE=install.log
@@ -43,6 +44,10 @@ do
       ;;
       -l|--logfile)
         LOG_FILE="$2"
+        shift # past argument
+      ;;
+      -m|--md5sum)
+        MD5SUM="$2"
         shift # past argument
       ;;
       -p|--password)
@@ -122,29 +127,36 @@ else
 fi
 
 
-echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
+echo "`date` INFO:Get the md5sum of the expected solace image" &>> ${LOG_FILE}
 # ------------------------------------------------
-wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
-REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
-
-if [ ! -f /tmp/soltr-docker.tar.gz ]; then
-  LOOP_COUNT=0
-  while [ $LOOP_COUNT -lt 3 ]; do
-    wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
-    if [ 0 != `echo $?` ]; then
-      ((LOOP_COUNT++))
-    else
-      break
-    fi
-  done
-  if [ ${LOOP_COUNT} == 3 ]; then
-    echo "`date` ERROR: Failed to download VMR Docker image exiting"
-    exit 1
-  fi
-
-  docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
-  docker images &>> ${LOG_FILE}
+wget -O /tmp/solos.info -nv  ${MD5SUM}
+IFS=' ' read -ra SOLOS_INFO <<< `cat /tmp/solos.info`
+MD5_SUM=${SOLOS_INFO[0]}
+SolOS_LOAD=${SOLOS_INFO[1]}
+if [ -z ${MD5_SUM} ]; then
+  echo "`date` ERROR: Missing md5sum for the Solace load" | tee /dev/stderr | tee /dev/stderr &>> ${LOG_FILE}
+  exit 1
 fi
+echo "`date` INFO: Reference md5sum is: ${MD5_SUM}" &>> ${LOG_FILE}
+
+
+echo "`date` INFO:Get the solace image" &>> ${LOG_FILE}
+# ------------------------------------------------
+wget -q -O  /tmp/${SolOS_LOAD} ${URL}
+LOCAL_OS_INFO=`md5sum /tmp/${SolOS_LOAD}`
+IFS=' ' read -ra SOLOS_INFO <<< ${LOCAL_OS_INFO}
+LOCAL_MD5_SUM=${SOLOS_INFO[0]}
+if [ ${LOCAL_MD5_SUM} != ${MD5_SUM} ]; then
+  echo "`date` ERROR: Possible corrupt Solace load, md5sum do not match" | tee /dev/stderr &>> ${LOG_FILE}
+  exit 1
+else
+  echo "`date` INFO: Successfully downloaded ${SolOS_LOAD}" &>> ${LOG_FILE}
+fi
+
+docker load -i /tmp/${SolOS_LOAD} &>> ${LOG_FILE}
+export SOLOS_VERSION=`docker images | grep solace | awk '{print $3}'` &>> ${LOG_FILE}
+echo "`date` INFO: Solace message broker image: ${SOLOS}" &>> ${LOG_FILE}
+
 
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
@@ -171,15 +183,15 @@ docker create \
    --net=host \
    --restart=always \
    ${SOLACE_CLOUD_INIT} \
-   --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
+   --name=solace ${SOLOS_VERSION} &>> ${LOG_FILE}
 
 docker ps -a &>> ${LOG_FILE}
 
-echo "`date` INFO:Construct systemd for VMR" &>> ${LOG_FILE}
+echo "`date` INFO:Construct systemd for Solace PubSub+" &>> ${LOG_FILE}
 # --------------------------------------
-tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
+tee /etc/systemd/system/solace-docker.service <<-EOF
 [Unit]
-  Description=solace-docker-vmr
+  Description=solace-docker
   Requires=docker.service
   After=docker.service
 [Service]
@@ -189,12 +201,12 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Install]
   WantedBy=default.target
 EOF
-echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" &>> ${LOG_FILE}
+echo "`date` INFO:/etc/systemd/system/solace-docker.service =/n `cat /etc/systemd/system/solace-docker.service`" &>> ${LOG_FILE}
 
-echo "`date` INFO: Start the VMR"
+echo "`date` INFO: Start the Solace Message Router"
 # --------------------------
 systemctl daemon-reload &>> ${LOG_FILE}
-systemctl enable solace-docker-vmr &>> ${LOG_FILE}
-systemctl start solace-docker-vmr &>> ${LOG_FILE}
+systemctl enable solace-docker &>> ${LOG_FILE}
+systemctl start solace-docker &>> ${LOG_FILE}
 
 echo "`date` INFO: Install is complete"
