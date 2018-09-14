@@ -19,7 +19,12 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 
 ```
 #!/bin/bash
-if [ ! -f /var/lib/solace ]; then
+##################################
+# Update following variables as needed
+SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest"
+ADMIN_PASSWORD=<Admin password>
+#
+if [ ! -d /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
   yum install -y wget
@@ -37,7 +42,7 @@ if [ ! -f /var/lib/solace ]; then
     exit 1
   fi
   chmod +x /var/lib/solace/solos-install.sh
-  /var/lib/solace/solos-install.sh -p <SolOS/SolAdmin password>
+  /var/lib/solace/solos-install.sh -p $ADMIN_PASSWORD -i SOLACE_DOCKER_IMAGE_REFERENCE
 fi
 ```
 
