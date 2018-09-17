@@ -20,8 +20,8 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 ```
 #!/bin/bash
 ##################################
-# Update following variables as needed
-SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest"
+# Update following variables as needed:
+SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # default to pull latest PubSub+ standard from docker hub
 ADMIN_PASSWORD=<Admin password>
 #
 if [ ! -d /var/lib/solace ]; then
@@ -30,7 +30,7 @@ if [ ! -d /var/lib/solace ]; then
   yum install -y wget
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/solos-install.sh
+    wget https://raw.githubusercontent.com/SolaceProducts/solace-gcp-quickstart/master/scripts/install-solace.sh
     if [ 0 != `echo $?` ]; then 
       ((LOOP_COUNT++))
     else
@@ -41,8 +41,8 @@ if [ ! -d /var/lib/solace ]; then
     echo "`date` ERROR: Failed to download initial install script exiting"
     exit 1
   fi
-  chmod +x /var/lib/solace/solos-install.sh
-  /var/lib/solace/solos-install.sh -p $ADMIN_PASSWORD -i SOLACE_DOCKER_IMAGE_REFERENCE
+  chmod +x /var/lib/solace/install-solace.sh
+  /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i SOLACE_DOCKER_IMAGE_REFERENCE
 fi
 ```
 
