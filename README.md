@@ -6,7 +6,7 @@ This repository explains how to install a Solace PubSub+ Software Message Broker
 
 The Solace PubSub+ software message broker meets the needs of big data, cloud migration, and Internet-of-Things initiatives, and enables microservices and event-driven architecture. Capabilities include topic-based publish/subscribe, request/reply, message queues/queueing, and data streaming for IoT devices and mobile/web apps. The message broker supports open APIs and standard protocols including AMQP, JMS, MQTT, REST, and WebSocket. Moreover, it can be deployed in on-premise datacenters, natively within private and public clouds, and across complex hybrid cloud environments.
 
-Solace PubSub+ software message brokers can be deployed in either a 3-node High-Availability (HA) cluster, or as a single node deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA cluster is required.
+Solace PubSub+ software message brokers can be deployed in either a 3-node High-Availability (HA) cluster, or as a single-node deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA cluster is required.
 
 # How to deploy a message broker
 
@@ -18,7 +18,7 @@ This is a 3 step process:
 
 First, decide which [Solace PubSub+ message broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
 
-Note: You can skip this step if using the default settings. By default this project installs the Solace PubSub+ software message router, Standard Edition from the latest Docker image available from Docker Hub.
+**Note:** You can skip the rest of this step if using the default settings. By default this project installs the Solace PubSub+ software message router, Standard Edition from the latest Docker image available from Docker Hub.
 
 The Docker image reference can be:
 
@@ -51,7 +51,7 @@ size of at least 30 GB depolyed on Centos7 OS:
 
 * If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customise your IP addresses. You need to pick 3 available internal IPs.
 
-> Tip: gather all 3 IP addresses before continuing by trying availability (there is a feedback if entered address is being used by another resource) and designate each one to one of the Primary, Backup and Monitor nodes.
+> Tip: gather all 3 IP addresses before continuing by trying availability (there is feedback if entered address is being used by another resource) and designate each one to one of the Primary, Backup and Monitor nodes.
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
 
@@ -61,13 +61,9 @@ size of at least 30 GB depolyed on Centos7 OS:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the code into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user. 
+Cut and paste the code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user.
 
-
-
-
-
-
+**Note:** For HA deployment additional environment variables are required, which will be discussed below.   
 
 ```
 #!/bin/bash
@@ -75,6 +71,10 @@ Cut and paste the code into the panel, replace the value of the variable `SOLACE
 # Update following variables as needed:
 SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # default to pull latest PubSub+ standard from docker hub
 ADMIN_PASSWORD=<ADMIN_PASSWORD>
+##################################
+# Add here environment variables for HA deployment, not required for single-node deployment.
+# export ...
+##################################
 #
 if [ ! -d /var/lib/solace ]; then
   mkdir /var/lib/solace
@@ -98,7 +98,68 @@ if [ ! -d /var/lib/solace ]; then
 fi
 ```
 
-### Step 2d: Submit the request
+#### HA deployment environment variables for the startup script
+
+The environment variables will be specific to the role of the nodes, i.e. Primary, Backup and Monitor.
+
+Assuming `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` IP addresses for the nodes, depending on the role here are the environment variables to be added to the beginning of above startup script:
+
+Primary:
+```
+##These are example values for configuring a primary node
+export baseroutername=gcevmr
+export nodetype=message_routing
+export routername=gcevmr1
+export configsync_enable=yes
+export redundancy_activestandbyrole=primary
+export redundancy_enable=yes
+export redundancy_group_password=gruyerecheese
+export redundancy_group_node_gcevmr0_connectvia=<MonitorIP>
+export redundancy_group_node_gcevmr0_nodetype=monitoring
+export redundancy_group_node_gcevmr1_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr1_nodetype=message_routing
+export redundancy_group_node_gcevmr2_connectvia=<BackupIP>
+export redundancy_group_node_gcevmr2_nodetype=message_routing
+export redundancy_matelink_connectvia=<BackupIP>
+```
+
+Backup:
+```
+##These are example values for configuring a backup node
+export baseroutername=gcevmr
+export nodetype=message_routing
+export routername=gcevmr2
+export configsync_enable=yes
+export redundancy_activestandbyrole=backup
+export redundancy_enable=yes
+export redundancy_group_password=gruyerecheese
+export redundancy_group_node_gcevmr0_connectvia=<MonitorIP>
+export redundancy_group_node_gcevmr0_nodetype=monitoring
+export redundancy_group_node_gcevmr1_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr1_nodetype=message_routing
+export redundancy_group_node_gcevmr2_connectvia=<BackupIP>
+export redundancy_group_node_gcevmr2_nodetype=message_routing
+export redundancy_matelink_connectvia=<PrimaryIP>
+```
+
+Monitor:
+```
+##These are example values for configuring a monitoring node
+export baseroutername=gcevmr
+export nodetype=monitoring
+export routername=gcevmr0
+export redundancy_enable=yes
+export redundancy_group_password=gruyerecheese
+export redundancy_group_node_gcevmr0_connectvia=<MonitorIP>
+export redundancy_group_node_gcevmr0_nodetype=monitoring
+export redundancy_group_node_gcevmr1_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr1_nodetype=message_routing
+export redundancy_group_node_gcevmr2_connectvia=<BackupIP>
+export redundancy_group_node_gcevmr2_nodetype=message_routing
+```
+
+
+### Step 2d: Submit the create request
 
 Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to indicate when the install has completed.
 
