@@ -63,7 +63,7 @@ size of at least 30 GB depolyed on Centos7 OS:
 
 Cut and paste the code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user.
 
-**Note:** For HA deployment additional environment variables are required, which will be discussed below.   
+**Note:** For HA deployment additional environment variables are required (see the script section "Add here environment variables..." near the beginning), which will be discussed below.   
 
 ```
 #!/bin/bash
@@ -102,7 +102,9 @@ fi
 
 The environment variables will be specific to the role of the nodes, i.e. Primary, Backup and Monitor.
 
-Assuming `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` IP addresses for the nodes, depending on the role here are the environment variables to be added to the beginning of above startup script:
+Assuming `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` IP addresses for the nodes, depending on the role, here are the environment variables to be added to the beginning of above startup script:
+
+**Note:** Ensure to replace the `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` values according to your settings.
 
 Primary:
 ```
@@ -163,33 +165,21 @@ export redundancy_group_node_gcevmr2_nodetype=message_routing
 
 Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to indicate when the install has completed.
 
-### Set config keys
+#### For HA deployment assert the primary message broker’s configuration
 
-https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm
-https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/Cloud-And-Machine-Tasks/Initializing-Config-Keys-With-Cloud-Init.htm#Setting_Config_Keys_and_Environ_Var
+As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ), after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging, assert the primary message broker’s configuration. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following command at the Master node:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
+curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version='soltr/8_5VMR'><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
+```
 
 ## Step 3: Set up network security to allow access
-Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
+Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_network.png "GCE Firewall rules")
 `tcp:80;tcp:8080;tcp:1883;tcp:8000;tcp:9000;tcp:55003;tcp:55555`
 
-For more information on the ports required for the message router see the [configuration defaults](http://docs.solace.com/Solace-VMR-Set-Up/VMR-Configuration-Defaults.htm)
-. For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls)
+For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls)
 
 # Gaining admin access to the VMR
 
