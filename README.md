@@ -8,29 +8,57 @@ The Solace PubSub+ software message broker meets the needs of big data, cloud mi
 
 Solace PubSub+ software message brokers can be deployed in either a 3-node High-Availability (HA) cluster, or as a single node deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA cluster is required.
 
-# How to deploy a single-node message broker
+# How to deploy a message broker
 
+In this quick start we go through the steps to set up a message broker either as a single stand-alone instance, or in a 3-node HA cluster.
 
+This is a 3 step process:
 
-* [Optional] By default this project installs the Solace PubSub+ software message router, Standard Edition from the Docker image available for Docker Hub.  If you want to install a different version you will have to provide a URL link to version and accompanying md5sum files with the --url and --md5sum flags for solos-install.  Visit http://dev.solace.com/downloads/ to see options and read release notes to understand differences.
+## Step 1 (Optional): Obtain a reference to the Docker image of the Solace PubSub+ message broker to be deployed
+
+First, decide which [Solace PubSub+ message broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
+
+Note: You can skip this step if using the default settings. By default this project installs the Solace PubSub+ software message router, Standard Edition from the latest Docker image available from Docker Hub.
+
+The Docker image reference can be:
+
+*	A public or accessible private Docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Standard. The default is to use the latest message broker image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version [tag](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ).
+
+*	A Docker image download URL
+     * If using Solace PubSub+ Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Enterprise Evaluation Edition Docker Images section.
+
+         | PubSub+ Enterprise Evaluation Edition<br/>Docker Image
+         | :---: |
+         | 90-day trial version of PubSub+ Enterprise |
+         | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
+
+     * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
+
+## Step 2: Create the required GCE Compute Engine instances
+
+The single stand-alone instance requires 1 Compute Engine instance and the HA deployment requires 3.
+
+Repeat these instructions for all instances required and follow the specific requirements for HA setup as applicable.
 
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
 
+### Step 2a: Single Node deployment
+
 * Expand the the Management tab to expose the Automation Startup script panel
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the code into the panel, replace -link to VMR Docker Image- with the URL you received in step one.
+Cut and paste the code into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from Step 1, and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user. 
 
 ```
 #!/bin/bash
 ##################################
 # Update following variables as needed:
 SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # default to pull latest PubSub+ standard from docker hub
-ADMIN_PASSWORD=<Admin password>
+ADMIN_PASSWORD=<ADMIN_PASSWORD>
 #
 if [ ! -d /var/lib/solace ]; then
   mkdir /var/lib/solace
@@ -56,7 +84,17 @@ fi
 
 Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the VMR.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to indicate when the install has completed.
 
-# Set up network security to allow access
+### Step 2b: HA cluster deployment
+
+* If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customise your IP addresses. You need to pick 3 available internal IPs.
+
+> Tip: gather all 3 IP addresses before continuing.
+
+![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
+
+
+
+## Step 3: Set up network security to allow access
 Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_network.png "GCE Firewall rules")
