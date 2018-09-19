@@ -36,22 +36,38 @@ The Docker image reference can be:
 
 ## Step 2: Create the required GCE Compute Engine instances
 
-The single stand-alone instance requires 1 Compute Engine instance and the HA deployment requires 3.
+The single stand-alone instance requires 1 Compute Engine instance and the HA deployment requires 3 instances for the Primary, Backup and Monitor nodes.
 
 Repeat these instructions for all instances required and follow the specific requirements for HA setup as applicable.
+
+### Step 2a: Select instance machine type and parameters
 
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
 
-### Step 2a: Single Node deployment
+### Step 2b: (HA cluster deployment only) customise your IP addresses
+
+* If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customise your IP addresses. You need to pick 3 available internal IPs.
+
+> Tip: gather all 3 IP addresses before continuing by trying availability (there is a feedback if entered address is being used by another resource) and designate each one to one of the Primary, Backup and Monitor nodes.
+
+![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
+
+### Step 2c: Add automated startup script
 
 * Expand the the Management tab to expose the Automation Startup script panel
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the code into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from Step 1, and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user. 
+Cut and paste the code into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user. 
+
+
+
+
+
+
 
 ```
 #!/bin/bash
@@ -82,15 +98,26 @@ if [ ! -d /var/lib/solace ]; then
 fi
 ```
 
-Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the VMR.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to indicate when the install has completed.
+### Step 2d: Submit the request
 
-### Step 2b: HA cluster deployment
+Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to indicate when the install has completed.
 
-* If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customise your IP addresses. You need to pick 3 available internal IPs.
+### Set config keys
 
-> Tip: gather all 3 IP addresses before continuing.
+https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm
+https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/Cloud-And-Machine-Tasks/Initializing-Config-Keys-With-Cloud-Init.htm#Setting_Config_Keys_and_Environ_Var
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
