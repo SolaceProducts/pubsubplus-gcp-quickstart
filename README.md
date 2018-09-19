@@ -1,10 +1,18 @@
-# Install a Solace Message Router onto a Google Compute Engine Linux Virtual Machine
+# Install a Solace PubSub+ Software Message Broker onto Google Compute Engine Linux Virtual Machines
 
-The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds. 
+This repository explains how to install a Solace PubSub+ Software Message Broker in various configurations onto Google Compute Engine (GCE) Linux Virtual Machines. This guide is intended mainly for development and demo purposes.
 
-# How to Deploy a VMR
+# Description of the Solace PubSub+ Software Message Broker
 
-* [Optional] By default this project installs the Solace PubSub+ software message router, Standard Edition.  If you want to install a different version you will have to provide link to version and accompanying md5sum files with the --url and --md5sum flags for solos-install.  Visit http://dev.solace.com/downloads/ to see options and read release notes to understand differences.
+The Solace PubSub+ software message broker meets the needs of big data, cloud migration, and Internet-of-Things initiatives, and enables microservices and event-driven architecture. Capabilities include topic-based publish/subscribe, request/reply, message queues/queueing, and data streaming for IoT devices and mobile/web apps. The message broker supports open APIs and standard protocols including AMQP, JMS, MQTT, REST, and WebSocket. Moreover, it can be deployed in on-premise datacenters, natively within private and public clouds, and across complex hybrid cloud environments.
+
+Solace PubSub+ software message brokers can be deployed in either a 3-node High-Availability (HA) cluster, or as a single node deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA cluster is required.
+
+# How to deploy a single-node message broker
+
+
+
+* [Optional] By default this project installs the Solace PubSub+ software message router, Standard Edition from the Docker image available for Docker Hub.  If you want to install a different version you will have to provide a URL link to version and accompanying md5sum files with the --url and --md5sum flags for solos-install.  Visit http://dev.solace.com/downloads/ to see options and read release notes to understand differences.
 
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
