@@ -73,7 +73,7 @@ SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # default t
 ADMIN_PASSWORD=<ADMIN_PASSWORD>
 ##################################
 # Add here environment variables for HA deployment, not required for single-node deployment.
-# export ...
+# export ... see next section HA deployment environment variables
 ##################################
 #
 if [ ! -d /var/lib/solace ]; then
@@ -94,7 +94,7 @@ if [ ! -d /var/lib/solace ]; then
     exit 1
   fi
   chmod +x /var/lib/solace/install-solace.sh
-  /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i SOLACE_DOCKER_IMAGE_REFERENCE
+  /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE
 fi
 ```
 
@@ -167,9 +167,14 @@ Now hit the "Create" button on the bottom of this page. This will start the proc
 
 #### For HA deployment assert the primary message broker’s configuration
 
-As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ), after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging, assert the primary message broker’s configuration. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following command at the Master node:
+As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ), after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging, assert the primary message broker’s configuration. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following command at the Primary node:
 
 ```
+# check redundancy status
+curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version=\"soltr/8_5VMR\"><show><re
+dundancy></redundancy></show></rpc>"
+
+# wait until redundancy is up the execute next command:
 curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version='soltr/8_5VMR'><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
 ```
 
@@ -179,7 +184,7 @@ Now that the message broker is instantiated, the network security firewall rule 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_network.png "GCE Firewall rules")
 `tcp:80;tcp:8080;tcp:1883;tcp:8000;tcp:9000;tcp:55003;tcp:55555`
 
-For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls)
+For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
 
 # Gaining admin access to the VMR
 
