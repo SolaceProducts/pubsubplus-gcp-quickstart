@@ -45,7 +45,7 @@ Repeat these instructions for all instances required and follow the specific req
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
 
-**Note:** in an HA deployment the Monitor node requires only 1 vCPU and the standard 10 GB disk space will suffice.
+**Note:** in an HA deployment it is recommended to choose a different availability zone for each node. Also, the Monitor node requires only 1 vCPU and the standard 10 GB disk space.
 
 ![alt text](/images/gce_launch_1.png "GCE Image creation 1")
 
