@@ -199,6 +199,8 @@ Management IP will be the Public IP associated with your GCE instance and port w
 
 **Note:** if using the HA deployment, unless specifically required otherwise, use the GCE instance that is in Active role (this is the Primary node at the initial setup but can be the Backup node after a failover).
 
+![alt text](/images/gce_public_ip.png "getting started publish/subscribe")
+
 ## Solace CLI access
 
 Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance, then launch a SolOS cli session:
