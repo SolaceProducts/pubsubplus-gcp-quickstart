@@ -45,7 +45,7 @@ Repeat these instructions for all instances required and follow the specific req
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
+![alt text](/images/gce_launch_1.png "GCE Image creation 1")
 
 ### Step 2b: (HA cluster deployment only) customise your IP addresses
 
@@ -53,13 +53,13 @@ size of at least 30 GB depolyed on Centos7 OS:
 
 > Tip: gather all 3 IP addresses before continuing by trying availability (there is feedback if entered address is being used by another resource) and designate each one to one of the Primary, Backup and Monitor nodes.
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
+![alt text](/images/gce_launch_3.png "GCE Image creation 3")
 
 ### Step 2c: Add automated startup script
 
 * Expand the the Management tab to expose the Automation Startup script panel
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
+![alt text](/images/gce_launch_2.png "GCE Image creation 2")
 
 Cut and paste the code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user.
 
@@ -182,7 +182,7 @@ curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version='soltr/
 
 Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_network.png "GCE Firewall rules")
+![alt text](/images/gce_network.png "GCE Firewall rules")
 `tcp:80;tcp:8080;tcp:1883;tcp:8000;tcp:9000;tcp:55003;tcp:55555`
 
 For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
@@ -238,7 +238,8 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Authors
 
-See the list of [contributors](https://github.com/SolaceLabs/solace-gcp-quickstart/graphs/contributors) who participated in this project.
+See the list of [contributors](https://github.com/SolaceProducts/solace-gcp-quickstart/graphs/contributors) who participated in this project.
+
 
 ## License
 
