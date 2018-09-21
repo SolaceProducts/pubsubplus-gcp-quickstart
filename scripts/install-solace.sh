@@ -53,24 +53,24 @@ do
   shift # past argument or value
 done
 
-echo "`date` INFO: Validate we have been passed a VMR url"
+echo "`date` INFO: Validate we have been passed a Solace Docker Image reference" &>> ${LOG_FILE}
 # -----------------------------------------------------
 if [ -z "$SOLACE_DOCKER_IMAGE_REF" ]
 then
       echo "USAGE: install-solace.sh -i <Solace Docker Image reference>"
       exit 1
 else
-      echo "`date` INFO: Solace Docker image reference is ${SOLACE_DOCKER_IMAGE_REF}"
+      echo "`date` INFO: Solace Docker image reference is ${SOLACE_DOCKER_IMAGE_REF}" &>> ${LOG_FILE}
 fi
 
 
-echo "`date` INFO:Get repositories up to date"
+echo "`date` INFO: Get repositories up to date" &>> ${LOG_FILE}
 # ---------------------------------------
 
 yum -y update
 yum -y install lvm2
 
-echo "`date` INFO:Set up Docker Repository"
+echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------
 tee /etc/yum.repos.d/docker.repo <<-EOF
 [dockerrepo]
@@ -80,13 +80,13 @@ enabled=1
 gpgcheck=1
 gpgkey=https://yum.dockerproject.org/gpg
 EOF
-echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`" 
+echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
 
-echo "`date` INFO:Intall Docker"
+echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
 # -------------------------
 yum -y install docker-engine
 
-echo "`date` INFO:Configure Docker as a service"
+echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
 mkdir /etc/systemd/system/docker.service.d &>> install.log
 tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
@@ -94,7 +94,7 @@ tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
   ExecStart=
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
-echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`"
+echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
 
 systemctl enable docker
 systemctl start docker
@@ -107,27 +107,27 @@ while [ ${loop_count} != ${loop_guard} ]; do
   docker_running=`service docker status | grep -o running`
   if [ ${docker_running} != "running" ]; then
     ((loop_count++))
-    echo "`date` WARN: Tried to launch Solace but Docker in state ${docker_running}"
+    echo "`date` WARN: Tried to launch Solace but Docker in state ${docker_running}" &>> ${LOG_FILE}
     sleep 5
   else
-    echo "`date` INFO: Docker in state ${docker_running}"
+    echo "`date` INFO: Docker in state ${docker_running}" &>> ${LOG_FILE}
     break
   fi
 done
 
-echo "`date` INFO:Get the solace image"
+echo "`date` INFO: Get the solace image" &>> ${LOG_FILE}
 # ------------------------------------------------
 # Determine first if SOLACE_DOCKER_IMAGE_REF is a valid docker registry uri
 ## Remove any existing solace image
 if [ "`docker images | grep solace-`" ] ; then
-  echo "`date` INFO: Removing existing Solace images from local docker repo"
+  echo "`date` INFO: Removing existing Solace images from local docker repo" &>> ${LOG_FILE}
   docker rmi -f `docker images | grep solace- | awk '{print $3}'`
 fi
 ## Try to load SOLACE_DOCKER_IMAGE_REF as a docker registry uri
-echo "`date` Testing ${SOLACE_DOCKER_IMAGE_REF} for docker registry uri:"
+echo "`date` Testing ${SOLACE_DOCKER_IMAGE_REF} for docker registry uri:" &>> ${LOG_FILE}
 if [ -z "`docker pull ${SOLACE_DOCKER_IMAGE_REF}`" ] ; then
   # If NOT in this branch then load was successful
-  echo "`date` INFO: Found that ${SOLACE_DOCKER_IMAGE_REF} was not a docker registry uri, retrying if it is a download link"
+  echo "`date` INFO: Found that ${SOLACE_DOCKER_IMAGE_REF} was not a docker registry uri, retrying if it is a download link" &>> ${LOG_FILE}
   if [[ ${SOLACE_DOCKER_IMAGE_REF} == *"solace.com/download"* ]]; then
     REAL_LINK=${SOLACE_DOCKER_IMAGE_REF}
     # the new download url
@@ -141,12 +141,12 @@ if [ -z "`docker pull ${SOLACE_DOCKER_IMAGE_REF}`" ] ; then
   MD5_SUM=${SOLOS_INFO[0]}
   SolOS_LOAD=${SOLOS_INFO[1]}
   if [ -z ${MD5_SUM} ]; then
-    echo "`date` ERROR: Missing md5sum for the Solace load - exiting." | tee /dev/stderr
+    echo "`date` ERROR: Missing md5sum for the Solace load - exiting." | tee /dev/stderr &>> ${LOG_FILE}
     exit 1
   fi
-  echo "`date` INFO: Reference md5sum is: ${MD5_SUM}"
+  echo "`date` INFO: Reference md5sum is: ${MD5_SUM}" &>> ${LOG_FILE}
 
-  echo "`date` INFO: Now download from URL provided and validate, trying up to 5 times"
+  echo "`date` INFO: Now download from URL provided and validate, trying up to 5 times" &>> ${LOG_FILE}
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 5 ]; do
     wget -q -O  ${solace_directory}/${SolOS_LOAD} ${REAL_LINK} || echo "There has been an issue with downloading the Solace load"
@@ -155,15 +155,15 @@ if [ -z "`docker pull ${SOLACE_DOCKER_IMAGE_REF}`" ] ; then
     IFS=' ' read -ra SOLOS_INFO <<< ${LOCAL_OS_INFO}
     LOCAL_MD5_SUM=${SOLOS_INFO[0]}
     if [ -z "${MD5_SUM}" ] || [ "${LOCAL_MD5_SUM}" != "${MD5_SUM}" ]; then
-      echo "`date` WARN: Possible corrupt Solace load, md5sum do not match"
+      echo "`date` WARN: Possible corrupt Solace load, md5sum do not match" &>> ${LOG_FILE}
     else
-      echo "`date` INFO: Successfully downloaded ${SolOS_LOAD}"
+      echo "`date` INFO: Successfully downloaded ${SolOS_LOAD}" &>> ${LOG_FILE}
       break
     fi
     ((LOOP_COUNT++))
   done
   if [ ${LOOP_COUNT} == 3 ]; then
-    echo "`date` ERROR: Failed to download the Solace load, exiting" | tee /dev/stderr
+    echo "`date` ERROR: Failed to download the Solace load, exiting" &>> ${LOG_FILE}
     exit 1
   fi
   ## Load the image tarball
@@ -172,14 +172,14 @@ fi
 ## Image details
 export SOLACE_IMAGE_ID=`docker images | grep solace | awk '{print $3}'`
 if [ -z "${SOLACE_IMAGE_ID}" ] ; then
-  echo "`date` ERROR: Could not load a valid Solace docker image - exiting." | tee /dev/stderr
+  echo "`date` ERROR: Could not load a valid Solace docker image - exiting." &>> ${LOG_FILE}
   exit 1
 fi
-echo "`date` INFO: Successfully loaded ${SOLACE_DOCKER_IMAGE_REF} to local docker repo"
-echo "`date` INFO: Solace message broker image and tag: `docker images | grep solace | awk '{print $1,":",$2}'`"
+echo "`date` INFO: Successfully loaded ${SOLACE_DOCKER_IMAGE_REF} to local docker repo" &>> ${LOG_FILE}
+echo "`date` INFO: Solace message broker image and tag: `docker images | grep solace | awk '{print $1,":",$2}'`" &>> ${LOG_FILE}
 
 
-echo "`date` INFO:Set up swap"
+echo "`date` INFO:Set up swap" &>> ${LOG_FILE}
 # -----------------------------------------
 # Decide which scaling tier applies based on system memory
 # and set maxconnectioncount, ulimit, devshm and swap accordingly
@@ -215,9 +215,9 @@ else
   ulimit_nofile="2448:422192"
   SWAP_SIZE="2048"
 fi
-echo "`date` INFO: Based on memory size of ${MEM_SIZE}KiB, determined maxconnectioncount: ${maxconnectioncount}, shmsize: ${shmsize}, ulimit_nofile: ${ulimit_nofile}, SWAP_SIZE: ${SWAP_SIZE}"
+echo "`date` INFO: Based on memory size of ${MEM_SIZE}KiB, determined maxconnectioncount: ${maxconnectioncount}, shmsize: ${shmsize}, ulimit_nofile: ${ulimit_nofile}, SWAP_SIZE: ${SWAP_SIZE}" &>> ${LOG_FILE}
 
-echo "`date` INFO: Creating Swap space"
+echo "`date` INFO: Creating Swap space" &>> ${LOG_FILE}
 mkdir /var/lib/solace
 dd if=/dev/zero of=/var/lib/solace/swap count=${SWAP_SIZE} bs=1MiB
 mkswap -f /var/lib/solace/swap
@@ -225,7 +225,7 @@ chmod 0600 /var/lib/solace/swap
 swapon -f /var/lib/solace/swap
 grep -q 'solace\/swap' /etc/fstab || sudo sh -c 'echo "/var/lib/solace/swap none swap sw 0 0" >> /etc/fstab'
 
-echo "`date` INFO:Create a Docker instance from Solace Docker image"
+echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
 SOLACE_CLOUD_INIT="--env SERVICE_SSH_PORT=2222"
 [ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_globalaccesslevel=${USERNAME}"
@@ -253,7 +253,7 @@ docker create \
 
 docker ps -a
 
-echo "`date` INFO:Construct systemd for Solace PubSub+"
+echo "`date` INFO:Construct systemd for Solace PubSub+" &>> ${LOG_FILE}
 # --------------------------------------
 tee /etc/systemd/system/solace-docker.service <<-EOF
 [Unit]
@@ -267,12 +267,12 @@ tee /etc/systemd/system/solace-docker.service <<-EOF
 [Install]
   WantedBy=default.target
 EOF
-echo "`date` INFO:/etc/systemd/system/solace-docker.service =/n `cat /etc/systemd/system/solace-docker.service`"
+echo "`date` INFO:/etc/systemd/system/solace-docker.service =/n `cat /etc/systemd/system/solace-docker.service`" &>> ${LOG_FILE}
 
-echo "`date` INFO: Start the Solace Message Router"
+echo "`date` INFO: Start the Solace Message Router" &>> ${LOG_FILE}
 # --------------------------
 systemctl daemon-reload
 systemctl enable solace-docker
 systemctl start solace-docker
 
-echo "`date` INFO: Install is complete"
+echo "`date` INFO: Install is complete" &>> ${LOG_FILE}
