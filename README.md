@@ -179,6 +179,7 @@ curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version='soltr/
 ```
 
 ## Step 3: Set up network security to allow access
+
 Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_network.png "GCE Firewall rules")
@@ -186,9 +187,11 @@ Now that the message broker is instantiated, the network security firewall rule 
 
 For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
 
-# Gaining admin access to the VMR
+It may be also required to allow egress traffic to the internet for certain use cases. In this case create an additional rule using similar steps.
 
-For persons used to working with Solace message router console access, this is still available with the google compute engine instance.  Access the web ssh terminal window by clicking the [ssh] button next to your VMR instance,  then launch a SolOS cli session:
+# Gaining admin access to the message broker
+
+For persons used to working with Solace message router console access, this is still available with the google compute engine instance.  Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance,  then launch a SolOS cli session:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_console.png "GCE console with SolOS cli")
 `sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A`
@@ -197,9 +200,46 @@ For persons who are unfamiliar with the Solace mesage router or would prefer an 
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_webui.png " PubSub+ Manager connection to gce")
 
-# Testing data access to the VMR
+# Testing data access to the message broker
 
-To test data traffic though the newly created VMR instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
+## Gaining admin access to the message broker
+
+Refer to the [Management Tools section](https://docs.solace.com/Management-Tools.htm ) of the online documentation to learn more about the available tools. The WebUI is the recommended simplest way to administer the message broker for common tasks.
+
+### WebUI, SolAdmin and SEMP access
+
+Management IP will be the Public IP associated with your GCE instance and port will be 8080 by default.
+
+**Note:** if using the HA deployment, unless specifically required otherwise, use the GCE instance that is in Active role (this is the Primary node at the initial setup but can be the Backup node after a failover).
+
+### Solace CLI access
+
+Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance, then launch a SolOS cli session:
+
+```sh
+$sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A
+
+Solace PubSub+ Standard Version 8.12.0.1007
+
+The Solace PubSub+ Standard is proprietary software of
+Solace Corporation. By accessing the Solace PubSub+ Standard
+you are agreeing to the license terms and conditions located at
+http://www.solace.com/license-software
+
+Copyright 2004-2018 Solace Corporation. All rights reserved.
+To purchase product support, please contact Solace at: 
+http://dev.solace.com/contact-us/
+
+Operating Mode: Message Routing Node
+
+solace-gcp-quickstart-master>
+```
+
+### Testing data access to the message broker
+
+To test data traffic though the newly created message broker instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
+
+
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/solace_tutorial.png "getting started publish/subscribe")
 
