@@ -57,11 +57,11 @@ size of at least 30 GB depolyed on Centos7 OS:
 
 ### Step 2c: Add automated startup script
 
-* Expand the the Management tab to expose the Automation Startup script panel
+* Expand the the Management tab to expose the "Automation" "Startup script" panel
 
 ![alt text](/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user.
+Cut and paste the following code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user.
 
 **Note:** For HA deployment additional environment variables are required (see the script section "Add here environment variables..." near the beginning), which will be discussed below.   
 
@@ -163,7 +163,7 @@ export redundancy_group_node_gcevmr2_nodetype=message_routing
 
 ### Step 2d: Submit the create request
 
-Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router.  It is possible to access the VM before the entire Solace solution is up.  You can monitor /var/lib/solace/install.log for the following entry: "'date' INFO: Install is complete" to indicate when the install has completed.
+Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router.  It is possible to access the VM before the entire Solace solution is up.  You can monitor `/var/lib/solace/install.log` for the following entry: `'date' INFO: Install is complete` to indicate when the install has completed.
 
 #### For HA deployment assert the primary message broker’s configuration
 
@@ -187,7 +187,7 @@ Now that the message broker is instantiated, the network security firewall rule 
 
 For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
 
-It may be also required to allow egress traffic to the internet for certain use cases. In this case create an additional rule using similar steps.
+**Note:** It may be also required to allow egress traffic to the internet for certain use cases. In this case create an additional rule using similar steps.
 
 # Gaining admin access to the message broker
 
@@ -195,7 +195,7 @@ Refer to the [Management Tools section](https://docs.solace.com/Management-Tools
 
 ## WebUI, SolAdmin and SEMP access
 
-Management IP will be the Public IP associated with your GCE instance and port will be 8080 by default.
+Management IP will be the External IP associated with your GCE instance and port will be 8080 by default.
 
 **Note:** if using the HA deployment, unless specifically required otherwise, use the GCE instance that is in Active role (this is the Primary node at the initial setup but can be the Backup node after a failover).
 
@@ -226,9 +226,9 @@ solace-gcp-quickstart-master>
 
 # Testing data access to the message broker
 
-To test data traffic though the newly created message broker instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
+To test data traffic though the newly created message broker instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started and provide the specific default port to use.
 
-For the single-node configuration the IP will be the Public IP associated with your GCE instance. For  HA deployment the use of [Client Host List](https://docs.solace.com/Features/SW-Broker-Redundancy-and-Fault-Tolerance.htm#Failover ) is required for seamless failover - this will consist of the Public IP addresses associated with your Primary and Backup node GCE instances.
+For single-node configuration the IP to use will be the External IP associated with your GCE instance. For  HA deployment the use of [Client Host List](https://docs.solace.com/Features/SW-Broker-Redundancy-and-Fault-Tolerance.htm#Failover ) is required for seamless failover - this will consist of the External IP addresses associated with your Primary and Backup node GCE instances.
 
 ![alt text](/images/solace_tutorial.png "getting started publish/subscribe")
 
