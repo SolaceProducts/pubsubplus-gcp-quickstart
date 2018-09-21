@@ -191,28 +191,15 @@ It may be also required to allow egress traffic to the internet for certain use 
 
 # Gaining admin access to the message broker
 
-For persons used to working with Solace message router console access, this is still available with the google compute engine instance.  Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance,  then launch a SolOS cli session:
-
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_console.png "GCE console with SolOS cli")
-`sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A`
-
-For persons who are unfamiliar with the Solace mesage router or would prefer an administration application, the imbedded PubSub+ Manager is available.  For more information on PubSub+ Manager see the [PubSub+ Manager page](https://docs.solace.com/Solace-PubSub-Manager/PubSub-Manager-Overview.htm).  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
-
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_webui.png " PubSub+ Manager connection to gce")
-
-# Testing data access to the message broker
-
-## Gaining admin access to the message broker
-
 Refer to the [Management Tools section](https://docs.solace.com/Management-Tools.htm ) of the online documentation to learn more about the available tools. The WebUI is the recommended simplest way to administer the message broker for common tasks.
 
-### WebUI, SolAdmin and SEMP access
+## WebUI, SolAdmin and SEMP access
 
 Management IP will be the Public IP associated with your GCE instance and port will be 8080 by default.
 
 **Note:** if using the HA deployment, unless specifically required otherwise, use the GCE instance that is in Active role (this is the Primary node at the initial setup but can be the Backup node after a failover).
 
-### Solace CLI access
+## Solace CLI access
 
 Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance, then launch a SolOS cli session:
 
@@ -235,11 +222,9 @@ Operating Mode: Message Routing Node
 solace-gcp-quickstart-master>
 ```
 
-### Testing data access to the message broker
+# Testing data access to the message broker
 
 To test data traffic though the newly created message broker instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
-
-
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/solace_tutorial.png "getting started publish/subscribe")
 
