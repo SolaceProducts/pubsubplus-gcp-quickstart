@@ -190,7 +190,9 @@ Now that the message broker is instantiated, the network security firewall rule 
 
 For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
 
-**Note:** It may be also required to allow egress traffic to the internet for certain use cases. In this case create an additional rule using similar steps.
+**Note:** For troubleshooting, be aware that there may be existing firewall rules with the target "Apply to all" or otherwise applicable to the VMs you created and they will be additionally automatically applied.
+
+It may be also required to allow egress traffic to the internet for certain use cases. In this case create an additional rule using similar steps.
 
 # Gaining admin access to the message broker
 
