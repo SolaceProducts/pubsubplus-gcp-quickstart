@@ -45,6 +45,8 @@ Repeat these instructions for all instances required and follow the specific req
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
 size of at least 30 GB depolyed on Centos7 OS:
 
+**Note:** in an HA deployment the Monitor node requires only 1 vCPU and the standard 10 GB disk space will suffice.
+
 ![alt text](/images/gce_launch_1.png "GCE Image creation 1")
 
 ### Step 2b: (HA cluster deployment only) customise your IP addresses
@@ -70,7 +72,7 @@ Cut and paste the following code according to your deployment configuration into
 ##################################
 # Update following variables as needed:
 SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # default to pull latest PubSub+ standard from docker hub
-ADMIN_PASSWORD=<ADMIN_PASSWORD>
+ADMIN_PASSWORD="<ADMIN_PASSWORD>"
 ##################################
 # Add here environment variables for HA deployment, not required for single-node deployment.
 # export ... see next section HA deployment environment variables
