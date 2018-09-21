@@ -167,14 +167,15 @@ Now hit the "Create" button on the bottom of this page. This will start the proc
 
 #### For HA deployment assert the primary message broker’s configuration
 
-As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ), after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging, assert the primary message broker’s configuration. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following command at the Primary node:
+As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ), after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging, assert the primary message broker’s configuration. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node:
 
 ```
-# check redundancy status
+# query redundancy status
 curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version=\"soltr/8_5VMR\"><show><re
 dundancy></redundancy></show></rpc>"
 
-# wait until redundancy is up the execute next command:
+# wait until redundancy is up then execute the assert command:
+
 curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version='soltr/8_5VMR'><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
 ```
 
