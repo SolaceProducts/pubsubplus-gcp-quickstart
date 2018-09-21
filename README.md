@@ -228,7 +228,7 @@ To test data traffic though the newly created message broker instance, visit the
 
 For the single-node configuration the IP will be the Public IP associated with your GCE instance. For  HA deployment the use of [Client Host List](https://docs.solace.com/Features/SW-Broker-Redundancy-and-Fault-Tolerance.htm#Failover ) is required for seamless failover - this will consist of the Public IP addresses associated with your Primary and Backup node GCE instances.
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/solace_tutorial.png "getting started publish/subscribe")
+![alt text](/images/solace_tutorial.png "getting started publish/subscribe")
 
 ## Contributing
 
