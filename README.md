@@ -12,8 +12,6 @@ Solace PubSub+ software message brokers can be deployed in either a 3-node High-
 
 In this quick start we go through the steps to set up a message broker either as a single stand-alone instance, or in a 3-node HA cluster.
 
-This is a 3 step process:
-
 ## Step 1 (Optional): Obtain a reference to the Docker image of the Solace PubSub+ message broker to be deployed
 
 First, decide which [Solace PubSub+ message broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
@@ -42,18 +40,23 @@ Repeat these instructions for all instances required and follow the specific req
 
 ### Step 2a: Select instance machine type and parameters
 
-* Go to your Google Cloud Platform console and create a Compute Engine instance.  Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a
-size of at least 30 GB depolyed on Centos7 OS:
+* Go to your Google Cloud Platform console > Compute Engine > VM instances screen and create a Compute Engine instance by clicking on "Create instance".
+
+![alt text](/images/gce_createinstance_1.png "GCE Create VM Instance")
+
+Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a size of at least 30 GB depolyed on Centos7 OS:
 
 **Note:** in an HA deployment it is recommended to choose a different availability zone for each node. Also, the Monitor node requires only 1 vCPU and the standard 10 GB disk space.
 
 ![alt text](/images/gce_launch_1.png "GCE Image creation 1")
 
-### Step 2b: (HA cluster deployment only) customise your IP addresses
+### Step 2b: (HA cluster deployment only) Customise your IP addresses
 
 * If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customise your IP addresses. You need to pick 3 available internal IPs.
 
 > Tip: gather all 3 IP addresses before continuing by trying availability (there is feedback if entered address is being used by another resource) and designate each one to one of the Primary, Backup and Monitor nodes.
+
+Take note the configured IP addresses: `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>`, they will be used in subsequent steps.
 
 ![alt text](/images/gce_launch_3.png "GCE Image creation 3")
 
@@ -73,6 +76,7 @@ Cut and paste the following code according to your deployment configuration into
 # Update following variables as needed:
 SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # default to pull latest PubSub+ standard from docker hub
 ADMIN_PASSWORD="<ADMIN_PASSWORD>"
+GITHUB_BRANCH="SolaceProducts/solace-gcp-quickstart/master"
 ##################################
 # Add here environment variables for HA deployment, not required for single-node deployment.
 # export ... see next section HA deployment environment variables
@@ -84,7 +88,7 @@ if [ ! -d /var/lib/solace ]; then
   yum install -y wget
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget https://raw.githubusercontent.com/SolaceProducts/solace-gcp-quickstart/master/scripts/install-solace.sh
+    wget https://raw.githubusercontent.com/$GITHUB_BRANCH/scripts/install-solace.sh
     if [ 0 != `echo $?` ]; then 
       ((LOOP_COUNT++))
     else
@@ -165,23 +169,49 @@ export redundancy_group_node_gcevmr2_nodetype=message_routing
 
 ### Step 2d: Submit the create request
 
-Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router.  It is possible to access the VM before the entire Solace solution is up.  You can monitor `/var/lib/solace/install.log` for the following entry: `'date' INFO: Install is complete` to indicate when the install has completed.
+Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router. 
 
-#### For HA deployment assert the primary message broker’s configuration
+It is possible to access the VM before the entire Solace solution is up. You can monitor `/var/lib/solace/install.log` for the following entry: `'date' INFO: Install is complete` to indicate when the install has completed:
 
-As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ), after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging, assert the primary message broker’s configuration. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node:
+* On the Google Cloud Platform console VM instances screen locate the instance just started and wait for its status to become green (running).
+
+* In the Connect column select a way to SSH into the VM and connect to it.
+
+* Check the logs:
+
+```
+[test@gcp-qs-test ~]$ sudo su
+[root@gcp-qs-test test]# cd /var/lib/solace/
+[root@gcp-qs-test solace]# ls
+install.log  install-solace.sh  swap
+[root@gcp-qs-test solace]# tail -f install.log 
+  Requires=docker.service
+  After=docker.service
+[Service]
+  Restart=always
+  ExecStart=/usr/bin/docker start -a solace
+  ExecStop=/usr/bin/docker stop solace
+[Install]
+  WantedBy=default.target
+Fri Nov 23 15:33:55 UTC 2018 INFO: Start the Solace Message Router
+Fri Nov 23 15:33:55 UTC 2018 INFO: Install is complete
+```
+
+
+## Step 3: (HA cluster deployment only) Assert the primary message broker’s configuration
+
+As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ) it is required to assert the primary message broker’s configuration after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node (replace `<ADMIN_PASSWORD>` according to your settings):
 
 ```
 # query redundancy status
-curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version=\"soltr/8_5VMR\"><show><re
-dundancy></redundancy></show></rpc>"
+curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-version=\"soltr/8_5VMR\"><show><redundancy></redundancy></show></rpc>"
 
 # wait until redundancy is up then execute the assert command:
 
-curl -sS -u admin:admin http://localhost:8080/SEMP -d "<rpc semp-version='soltr/8_5VMR'><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
+curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-version='soltr/8_5VMR'><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
 ```
 
-## Step 3: Set up network security to allow access
+## Step 4: Set up network security to allow access
 
 Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
 
