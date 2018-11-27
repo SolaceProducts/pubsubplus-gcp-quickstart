@@ -1,6 +1,6 @@
 # Install a Solace PubSub+ Software Message Broker onto Google Compute Engine Linux Virtual Machines
 
-This repository explains how to install a Solace PubSub+ Software Message Broker in various configurations onto Google Compute Engine (GCE) Linux Virtual Machines. This guide is intended mainly for development and demo purposes.
+This repository explains how to install a Solace PubSub+ Software Message Broker in various configurations onto Google Compute Engine (GCE) Linux Virtual Machines. This guide is intended for development and demo purposes.
 
 # Description of the Solace PubSub+ Software Message Broker
 
@@ -16,7 +16,7 @@ In this quick start we go through the steps to set up a message broker either as
 
 First, decide which [Solace PubSub+ message broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
 
-**Note:** You can skip the rest of this step if using the default settings. By default this project installs the Solace PubSub+ software message router, Standard Edition from the latest Docker image available from Docker Hub.
+**Note:** You can skip the rest of this step if you're using the default settings. By default this project installs the Standard edition of the Solace PubSub+ software message broker from the latest Docker image available from Docker Hub.
 
 The Docker image reference can be:
 
@@ -30,13 +30,13 @@ The Docker image reference can be:
          | 90-day trial version of PubSub+ Enterprise |
          | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
 
-     * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
+     * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. You can then host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
 
 ## Step 2: Create the required GCE Compute Engine instances
 
-The single stand-alone instance requires 1 Compute Engine instance and the HA deployment requires 3 instances for the Primary, Backup and Monitor nodes.
+The single stand-alone instance requires 1 Compute Engine instance, and the HA deployment requires 3 instances for the Primary, Backup, and Monitor nodes.
 
-Repeat these instructions for all instances required and follow the specific requirements for HA setup as applicable.
+Repeat these instructions for all instances required, and follow the specific requirements for HA setup as applicable.
 
 ### Step 2a: Select instance machine type and parameters
 
@@ -44,9 +44,9 @@ Repeat these instructions for all instances required and follow the specific req
 
 ![alt text](/images/gce_createinstance_1.png "GCE Create VM Instance")
 
-Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a size of at least 30 GB depolyed on Centos7 OS:
+Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a size of at least 30 GB deployed on Centos7 OS:
 
-**Note:** in an HA deployment it is recommended to choose a different availability zone for each node. Also, the Monitor node requires only 1 vCPU and the standard 10 GB disk space.
+**Note:** In an HA deployment it's recommended to choose a different availability zone for each node. Also, the Monitor node requires only 1 vCPU and the standard 10 GB of disk space.
 
 ![alt text](/images/gce_launch_1.png "GCE Image creation 1")
 
@@ -54,21 +54,21 @@ Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS,
 
 * If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customise your IP addresses. You need to pick 3 available internal IPs.
 
-> Tip: gather all 3 IP addresses before continuing by trying availability (there is feedback if entered address is being used by another resource) and designate each one to one of the Primary, Backup and Monitor nodes.
+> Tip: Gather all 3 IP addresses before continuing by trying availability (there is feedback if the entered address is being used by another resource), and designating each one to one of the Primary, Backup, and Monitor nodes.
 
-Take note the configured IP addresses: `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>`, they will be used in subsequent steps.
+Take note of the configured IP addresses: `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>`, as they will be used in subsequent steps.
 
 ![alt text](/images/gce_launch_3.png "GCE Image creation 3")
 
 ### Step 2c: Add automated startup script
 
-* Expand the the Management tab to expose the "Automation" "Startup script" panel
+* Expand the Management tab to expose the "Automation" "Startup script" panel
 
 ![alt text](/images/gce_launch_2.png "GCE Image creation 2")
 
 Cut and paste the following code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user.
 
-**Note:** For HA deployment additional environment variables are required (see the script section "Add here environment variables..." near the beginning), which will be discussed below.   
+**Note:** For an HA deployment, additional environment variables are required (see the script section "Add here environment variables..." near the beginning), which is discussed below.   
 
 ```
 #!/bin/bash
@@ -106,11 +106,11 @@ fi
 
 #### HA deployment environment variables for the startup script
 
-The environment variables will be specific to the role of the nodes, i.e. Primary, Backup and Monitor.
+The environment variables are specific to the role of the nodes, i.e. Primary, Backup, and Monitor.
 
 Assuming `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` IP addresses for the nodes, depending on the role, here are the environment variables to be added to the beginning of above startup script:
 
-**Note:** Ensure to replace the `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` values according to your settings.
+**Note:** Ensure that you replace the `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` values according to your settings.
 
 Primary:
 ```
@@ -169,13 +169,13 @@ export redundancy_group_node_gcevmr2_nodetype=message_routing
 
 ### Step 2d: Submit the create request
 
-Now hit the "Create" button on the bottom of this page. This will start the process of starting the GCE instance, installing Docker and finally download and install the message router. 
+Now hit the "Create" button at the bottom of this page. This will begin the process of starting the GCE instance, installing Docker, and finally downloading and installing the message broker. 
 
-It is possible to access the VM before the entire Solace solution is up. You can monitor `/var/lib/solace/install.log` for the following entry: `'date' INFO: Install is complete` to indicate when the install has completed:
+It's possible to access the VM before the entire Solace solution is up. You can monitor `/var/lib/solace/install.log` for the following entry: `'date' INFO: Install is complete` to indicate when the installation has completed:
 
-* On the Google Cloud Platform console VM instances screen locate the instance just started and wait for its status to become green (running).
+* On the Google Cloud Platform console VM instances screen, locate the instance you've just started and wait for its status to become green (running).
 
-* In the Connect column select a way to SSH into the VM and connect to it.
+* In the Connect column, select a way to SSH into the VM and connect to it.
 
 * Check the logs:
 
@@ -200,7 +200,7 @@ Fri Nov 23 15:33:55 UTC 2018 INFO: Install is complete
 
 ## Step 3: (HA cluster deployment only) Assert the primary message broker’s configuration
 
-As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ) it is required to assert the primary message broker’s configuration after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node (replace `<ADMIN_PASSWORD>` according to your settings):
+As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ) it's required to assert the primary message broker’s configuration after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node (replace `<ADMIN_PASSWORD>` according to your settings):
 
 ```
 # query redundancy status
@@ -218,27 +218,27 @@ Now that the message broker is instantiated, the network security firewall rule 
 ![alt text](/images/gce_network.png "GCE Firewall rules")
 `tcp:80;tcp:8080;tcp:1883;tcp:8000;tcp:9000;tcp:55003;tcp:55555`
 
-For more information on the ports required for the message router see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
+For more information on the ports required for the message broker see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
 
-**Note:** For troubleshooting, be aware that there may be existing firewall rules with the target "Apply to all" or otherwise applicable to the VMs you created and they will be additionally automatically applied.
+**Note:** For troubleshooting, be aware that there may be existing firewall rules with the target "Apply to all", or otherwise applicable to the VMs you've created, and they will also be automatically applied.
 
-It may be also required to allow egress traffic to the internet for certain use cases. In this case create an additional rule using similar steps.
+It may also be required to allow egress traffic to the internet for certain use cases. In this case, create an additional rule using similar steps.
 
 # Gaining admin access to the message broker
 
-Refer to the [Management Tools section](https://docs.solace.com/Management-Tools.htm ) of the online documentation to learn more about the available tools. The WebUI is the recommended simplest way to administer the message broker for common tasks.
+Refer to the [Management Tools section](https://docs.solace.com/Management-Tools.htm ) of the online documentation to learn more about the available tools. The Solace PubSub+ Manager is the recommended way to administer the message broker for common tasks.
 
-## WebUI, SolAdmin and SEMP access
+## PubSub+ Manager, SolAdmin and SEMP access
 
-Management IP will be the External IP associated with your GCE instance and port will be 8080 by default.
+The Management IP will be the External IP associated with your GCE instance, and the port will be 8080 by default.
 
-**Note:** if using the HA deployment, unless specifically required otherwise, use the GCE instance that is in Active role (this is the Primary node at the initial setup but can be the Backup node after a failover).
+**Note:** If using the HA deployment, unless specifically required otherwise, use the GCE instance that is in the Active role (this is the Primary node at the initial setup, but can be the Backup node after a failover).
 
 ![alt text](/images/gce_public_ip.png "getting started publish/subscribe")
 
 ## Solace CLI access
 
-Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance, then launch a SolOS cli session:
+Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance, then launch a Solace CLI session:
 
 ```sh
 $sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A
@@ -261,9 +261,9 @@ solace-gcp-quickstart-master>
 
 # Testing data access to the message broker
 
-To test data traffic though the newly created message broker instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started and provide the specific default port to use.
+To test data traffic though the newly created message broker instance, visit the Solace Developer Portal and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started and provide the specific default port to use.
 
-For single-node configuration the IP to use will be the External IP associated with your GCE instance. For  HA deployment the use of [Client Host List](https://docs.solace.com/Features/SW-Broker-Redundancy-and-Fault-Tolerance.htm#Failover ) is required for seamless failover - this will consist of the External IP addresses associated with your Primary and Backup node GCE instances.
+For single-node configuration, the IP to use will be the External IP associated with your GCE instance. For HA deployment the use of [Client Host List](https://docs.solace.com/Features/SW-Broker-Redundancy-and-Fault-Tolerance.htm#Failover ) is required for seamless failover - this will consist of the External IP addresses associated with your Primary and Backup node GCE instances.
 
 ![alt text](/images/solace_tutorial.png "getting started publish/subscribe")
 
