@@ -117,7 +117,7 @@ Assuming `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` IP addresses for the node
 **Note:** Ensure that you replace the `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` values according to your settings.
 
 Primary:
-```
+```shell
 ##These are example values for configuring a primary node
 export baseroutername=gcevmr
 export nodetype=message_routing
@@ -136,7 +136,7 @@ export redundancy_matelink_connectvia=<BackupIP>
 ```
 
 Backup:
-```
+```shell
 ##These are example values for configuring a backup node
 export baseroutername=gcevmr
 export nodetype=message_routing
@@ -155,7 +155,7 @@ export redundancy_matelink_connectvia=<PrimaryIP>
 ```
 
 Monitor:
-```
+```shell
 ##These are example values for configuring a monitoring node
 export baseroutername=gcevmr
 export nodetype=monitoring
@@ -183,7 +183,7 @@ It's possible to access the VM before the entire Solace solution is up. You can 
 
 * Check the logs:
 
-```
+```shell
 [test@gcp-qs-test ~]$ sudo su
 [root@gcp-qs-test test]# cd /var/lib/solace/
 [root@gcp-qs-test solace]# ls
@@ -200,7 +200,7 @@ Fri Feb 22 19:04:54 UTC 2019 INFO: Install is complete
 
 As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ) it's required to assert the primary message broker’s configuration after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node (replace `<ADMIN_PASSWORD>` according to your settings):
 
-```
+```shell
 # query redundancy status
 curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-version=\"soltr/8_5VMR\"><show><redundancy></redundancy></show></rpc>"
 
@@ -240,7 +240,7 @@ The Management IP will be the External IP associated with your GCE instance, and
 
 Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance, then launch a Solace CLI session:
 
-```sh
+```shell
 $sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A
 
 Solace PubSub+ Standard Version 8.12.0.1007
