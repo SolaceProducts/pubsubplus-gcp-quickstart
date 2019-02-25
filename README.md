@@ -213,7 +213,7 @@ curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-vers
 
 Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports.
 
-It is recommended to use the network tag assigned at [Step 2b](#step-2b-ha-cluster-deployment-only-customise-your-ip-addresses ) to target your instances vs. targeting "All instances in the network".
+It is recommended to use the network tag assigned at [Step 2a](#step-2a-select-instance-machine-type-and-parameters ) to target your instances vs. targeting "All instances in the network".
 
 ![alt text](/images/gce_network.png "GCE Firewall rules")
 `80,8080,1883,8000,9000,55003,55443,55555`
