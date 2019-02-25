@@ -50,19 +50,19 @@ Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS,
 
 ![alt text](/images/gce_launch_1.png "GCE Image creation 1")
 
+It is recommended to assign a [network tag](https://cloud.google.com/vpc/docs/add-remove-network-tags ) to the VM instances, which will make it easier to set up targeted firewall rules - see [Step 4](#step-4-set-up-network-security-to-allow-access ). Expand the "Management, security, disks, networking, sole tenancy" dropdown, and select the "Networking" tab:
+
+![alt text](/images/gce_network_tag.png "Assigning a network tag")
+
 ### Step 2b: (HA cluster deployment only) Customize your IP addresses
 
-* If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customize your IP addresses. You need to pick 3 available internal IPs.
+* If you are configuring 3 HA nodes, use the Networking tab to edit the Network interfaces panel and customize your IP addresses. You need to pick 3 available internal IPs.
 
 > Tip: Gather all 3 IP addresses before continuing by trying availability (there is feedback if the entered address is being used by another resource), and designating each one to one of the Primary, Backup, and Monitor nodes.
 
 Take note of the configured IP addresses: `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>`, as they will be used in subsequent steps.
 
 ![alt text](/images/gce_launch_3.png "GCE Image creation 3")
-
-It is also recommended to assign a [network tag](https://cloud.google.com/vpc/docs/add-remove-network-tags ) to the VM instances, which will make it easier to set up targeted firewall rules - see also [Step 4](#step-4-set-up-network-security-to-allow-access )
-
-![alt text](/images/gce_network_tag.png "Assigning a network tag")
 
 ### Step 2c: Add automated startup script
 
