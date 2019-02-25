@@ -50,9 +50,13 @@ Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS,
 
 ![alt text](/images/gce_launch_1.png "GCE Image creation 1")
 
-### Step 2b: (HA cluster deployment only) Customise your IP addresses
+It is recommended to assign a [network tag](https://cloud.google.com/vpc/docs/add-remove-network-tags ) to the VM instances, which will make it easier to set up targeted firewall rules - see [Step 4](#step-4-set-up-network-security-to-allow-access ). Expand the "Management, security, disks, networking, sole tenancy" dropdown, and select the "Networking" tab:
 
-* If you are configuring 3 HA nodes, expand the Networking tab to edit the Network interfaces panel and customise your IP addresses. You need to pick 3 available internal IPs.
+![alt text](/images/gce_network_tag.png "Assigning a network tag")
+
+### Step 2b: (HA cluster deployment only) Customize your IP addresses
+
+* If you are configuring 3 HA nodes, use the Networking tab to edit the Network interfaces panel and customize your IP addresses. You need to pick 3 available internal IPs.
 
 > Tip: Gather all 3 IP addresses before continuing by trying availability (there is feedback if the entered address is being used by another resource), and designating each one to one of the Primary, Backup, and Monitor nodes.
 
@@ -66,16 +70,16 @@ Take note of the configured IP addresses: `<PrimaryIP>`, `<BackupIP>` and `<Moni
 
 ![alt text](/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the following code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `<ADMIN_PASSWORD>` with the desired password for the management `admin` user.
+Cut and paste the following code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `ADMIN_PASSWORD` with the desired password for the management `admin` user.
 
 **Note:** For an HA deployment, additional environment variables are required (see the script section "Add here environment variables..." near the beginning), which is discussed below.   
 
-```
+```shell
 #!/bin/bash
 ##################################
 # Update following variables as needed:
-SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # default to pull latest PubSub+ standard from docker hub
-ADMIN_PASSWORD="<ADMIN_PASSWORD>"
+SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # Default to pull latest PubSub+ standard from docker hub
+ADMIN_PASSWORD="admin-password"                                      # Update to a real password
 GITHUB_BRANCH="SolaceProducts/solace-gcp-quickstart/master"
 ##################################
 # Add here environment variables for HA deployment, not required for single-node deployment.
@@ -113,7 +117,7 @@ Assuming `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` IP addresses for the node
 **Note:** Ensure that you replace the `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` values according to your settings.
 
 Primary:
-```
+```shell
 ##These are example values for configuring a primary node
 export baseroutername=gcevmr
 export nodetype=message_routing
@@ -132,7 +136,7 @@ export redundancy_matelink_connectvia=<BackupIP>
 ```
 
 Backup:
-```
+```shell
 ##These are example values for configuring a backup node
 export baseroutername=gcevmr
 export nodetype=message_routing
@@ -151,7 +155,7 @@ export redundancy_matelink_connectvia=<PrimaryIP>
 ```
 
 Monitor:
-```
+```shell
 ##These are example values for configuring a monitoring node
 export baseroutername=gcevmr
 export nodetype=monitoring
@@ -179,22 +183,16 @@ It's possible to access the VM before the entire Solace solution is up. You can 
 
 * Check the logs:
 
-```
+```shell
 [test@gcp-qs-test ~]$ sudo su
 [root@gcp-qs-test test]# cd /var/lib/solace/
 [root@gcp-qs-test solace]# ls
 install.log  install-solace.sh  swap
 [root@gcp-qs-test solace]# tail -f install.log 
-  Requires=docker.service
-  After=docker.service
-[Service]
-  Restart=always
-  ExecStart=/usr/bin/docker start -a solace
-  ExecStop=/usr/bin/docker stop solace
-[Install]
-  WantedBy=default.target
-Fri Nov 23 15:33:55 UTC 2018 INFO: Start the Solace Message Router
-Fri Nov 23 15:33:55 UTC 2018 INFO: Install is complete
+:
+:
+Fri Feb 22 19:04:54 UTC 2019 INFO: Start the Solace Message Router
+Fri Feb 22 19:04:54 UTC 2019 INFO: Install is complete
 ```
 
 
@@ -202,7 +200,7 @@ Fri Nov 23 15:33:55 UTC 2018 INFO: Install is complete
 
 As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ) it's required to assert the primary message broker’s configuration after a Solace PubSub+ software message broker HA redundancy group is configured to support Guaranteed messaging. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node (replace `<ADMIN_PASSWORD>` according to your settings):
 
-```
+```shell
 # query redundancy status
 curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-version=\"soltr/8_5VMR\"><show><redundancy></redundancy></show></rpc>"
 
@@ -213,16 +211,18 @@ curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-vers
 
 ## Step 4: Set up network security to allow access
 
-Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
+Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports.
+
+It is recommended to use the network tag assigned at [Step 2a](#step-2a-select-instance-machine-type-and-parameters ) to target your instances vs. targeting "All instances in the network".
 
 ![alt text](/images/gce_network.png "GCE Firewall rules")
-`tcp:80;tcp:8080;tcp:1883;tcp:8000;tcp:9000;tcp:55003;tcp:55555`
+`80,8080,1883,8000,9000,55003,55443,55555`
 
 For more information on the ports required for the message broker see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
 
-**Note:** For troubleshooting, be aware that there may be existing firewall rules with the target "Apply to all", or otherwise applicable to the VMs you've created, and they will also be automatically applied.
+**Note:** For troubleshooting, be aware that there may be existing firewall rules with the target "All instances in the network", or otherwise applicable to the VMs you have created, and they will be automatically applied.
 
-It may also be required to allow egress traffic to the internet for certain use cases. In this case, create an additional rule using similar steps.
+It may also be required to allow egress traffic to the Internet for certain use cases. In this case, create an additional rule using similar steps.
 
 # Gaining admin access to the message broker
 
@@ -240,7 +240,7 @@ The Management IP will be the External IP associated with your GCE instance, and
 
 Access the web ssh terminal window by clicking the [ssh] button next to your message broker instance, then launch a Solace CLI session:
 
-```sh
+```shell
 $sudo docker exec -it solace /usr/sw/loads/currentload/bin/cli -A
 
 Solace PubSub+ Standard Version 8.12.0.1007
