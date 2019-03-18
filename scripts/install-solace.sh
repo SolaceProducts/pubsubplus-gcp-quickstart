@@ -196,7 +196,7 @@ elif [ ${MEM_SIZE} -lt 12000000 ]; then
   shmsize="2g"
   ulimit_nofile="2448:10192"
   SWAP_SIZE="2048"
-elif [ ${MEM_SIZE} -lt 29000000 ]; then
+elif [ ${MEM_SIZE} -lt 28000000 ]; then
   # 10000 if 12GiB<=mem<28GiB
   maxconnectioncount="10000"
   shmsize="2g"
@@ -274,5 +274,11 @@ echo "`date` INFO: Start the Solace Message Router" &>> ${LOG_FILE}
 systemctl daemon-reload
 systemctl enable solace-docker
 systemctl start solace-docker
+
+echo "`date` INFO: Port forward workaround for health check packets with dest IP of the load balancer to internal IP" &>> ${LOG_FILE}
+# --------------------------
+export VM_INTERNAL_IP=`ifconfig eth0 | grep "inet " | awk '{print $2}'`
+sudo firewall-cmd --add-forward-port=port=5550:proto=tcp:toport=5550:toaddr=$VM_INTERNAL_IP --permanent
+sudo firewall-cmd --reload
 
 echo "`date` INFO: Install is complete" &>> ${LOG_FILE}
