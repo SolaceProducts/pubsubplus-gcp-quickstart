@@ -184,32 +184,33 @@ echo "`date` INFO:Set up swap" &>> ${LOG_FILE}
 # Decide which scaling tier applies based on system memory
 # and set maxconnectioncount, ulimit, devshm and swap accordingly
 MEM_SIZE=`cat /proc/meminfo | grep MemTotal | tr -dc '0-9'`
-if [ ${MEM_SIZE} -lt 4000000 ]; then
-  # 100 if mem<4GiB
+# check physical memory reported in KiB vs. MiB requirements for Solace scaling tier resources
+if [ ${MEM_SIZE} -lt 3837952 ]; then
+  # 100 if mem<3748 MiB
   maxconnectioncount="100"
   shmsize="1g"
   ulimit_nofile="2448:6592"
   SWAP_SIZE="1024"
-elif [ ${MEM_SIZE} -lt 12000000 ]; then
-  # 1000 if 4GiB<=mem<12GiB
+elif [ ${MEM_SIZE} -lt 11592704 ]; then
+  # 1000 if 3748 MiB<=mem<11,321 MiB
   maxconnectioncount="1000"
   shmsize="2g"
   ulimit_nofile="2448:10192"
   SWAP_SIZE="2048"
-elif [ ${MEM_SIZE} -lt 28000000 ]; then
-  # 10000 if 12GiB<=mem<28GiB
+elif [ ${MEM_SIZE} -lt 27258880 ]; then
+  # 10000 if 11,321 MiB<=mem<26,620 MiB
   maxconnectioncount="10000"
   shmsize="2g"
   ulimit_nofile="2448:42192"
   SWAP_SIZE="2048"
-elif [ ${MEM_SIZE} -lt 58000000 ]; then
-  # 100000 if 28GiB<=mem<56GiB
+elif [ ${MEM_SIZE} -lt 53272576 ]; then
+  # 100000 if 26,620 MiB<=mem<52,024 MiB
   maxconnectioncount="100000"
   shmsize="3380m"
   ulimit_nofile="2448:222192"
   SWAP_SIZE="2048"
 else
-  # 200000 if 56GiB<=mem
+  # 200000 if 52,024 MiB<=mem
   maxconnectioncount="200000"
   shmsize="3380m"
   ulimit_nofile="2448:422192"
