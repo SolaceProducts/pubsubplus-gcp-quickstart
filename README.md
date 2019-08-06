@@ -216,7 +216,7 @@ Now that the message broker is instantiated, the network security firewall rule 
 It is recommended to use the network tag assigned at [Step 2a](#step-2a-select-instance-machine-type-and-parameters ) to target your instances vs. targeting "All instances in the network".
 
 ![alt text](/images/gce_network.png "GCE Firewall rules")
-`80,8080,1883,8000,9000,55003,55443,55555`
+`60080,60443,8080,60943,1883,8000,9000,55003,55443,55555`
 
 For more information on the ports required for the message broker see the [configuration defaults](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/SW-Broker-Configuration-Defaults.htm ). For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls ).
 
