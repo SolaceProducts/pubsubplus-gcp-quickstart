@@ -227,7 +227,7 @@ grep -q 'solace\/swap' /etc/fstab || sudo sh -c 'echo "/var/lib/solace/swap none
 
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
-SOLACE_CLOUD_INIT="--env ervice_ssh_port=2222
+SOLACE_CLOUD_INIT="--env service_ssh_port=2222
    --env service_webtransport_port=60080
    --env service_webtransport_tlsport=60443
    --env service_semp_tlsport=60943"
@@ -246,8 +246,6 @@ docker create \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
    --ulimit nofile=${ulimit_nofile} \
-   --cap-add=IPC_LOCK \
-   --cap-add=SYS_NICE \
    --net=host \
    --restart=always \
    --env "system_scaling_maxconnectioncount=${maxconnectioncount}" \
