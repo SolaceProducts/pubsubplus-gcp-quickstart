@@ -91,7 +91,7 @@ if [ ! -d /var/lib/solace ]; then
   cd /var/lib/solace
   yum install -y wget
   LOOP_COUNT=0
-  while [ $LOOP_COUNT -lt 3 ]; do
+  while [ $LOOP_COUNT -lt 30 ]; do
     wget https://raw.githubusercontent.com/$GITHUB_BRANCH/scripts/install-solace.sh
     if [ 0 != `echo $?` ]; then 
       ((LOOP_COUNT++))
@@ -99,7 +99,7 @@ if [ ! -d /var/lib/solace ]; then
       break
     fi
   done
-  if [ ${LOOP_COUNT} == 3 ]; then
+  if [ ${LOOP_COUNT} == 30 ]; then
     echo "`date` ERROR: Failed to download initial install script exiting"
     exit 1
   fi
