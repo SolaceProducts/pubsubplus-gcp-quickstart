@@ -89,9 +89,9 @@ GITHUB_BRANCH="SolaceProducts/solace-gcp-quickstart/master"
 if [ ! -d /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
-  yum install -y wget
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 30 ]; do
+    yum install -y wget || echo "yum not ready, waiting"
     wget https://raw.githubusercontent.com/$GITHUB_BRANCH/scripts/install-solace.sh
     if [ 0 != `echo $?` ]; then 
       ((LOOP_COUNT++))
@@ -100,7 +100,7 @@ if [ ! -d /var/lib/solace ]; then
     fi
   done
   if [ ${LOOP_COUNT} == 30 ]; then
-    echo "`date` ERROR: Failed to download initial install script exiting"
+    echo "`date` ERROR: Failed to download initial install script - exiting"
     exit 1
   fi
   chmod +x /var/lib/solace/install-solace.sh
@@ -212,6 +212,8 @@ curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-vers
 ## Step 4: Set up network security to allow access
 
 Now that the message broker is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports.
+
+Source IP ranges is now a mandatory field, put in `0.0.0.0/0` to allow any access or a custom IP range if required.
 
 It is recommended to use the network tag assigned at [Step 2a](#step-2a-select-instance-machine-type-and-parameters ) to target your instances vs. targeting "All instances in the network".
 
