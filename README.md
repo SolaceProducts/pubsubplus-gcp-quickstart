@@ -114,24 +114,24 @@ The environment variables are specific to the role of the nodes, i.e. Primary, B
 
 Assuming `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` IP addresses for the nodes, depending on the role, here are the environment variables to be added to the beginning of above startup script:
 
-**Note:** Ensure that you replace the `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` values according to your settings.
+**Note:** Ensure that you replace the `<PrimaryIP>`, `<BackupIP>` and `<MonitorIP>` values according to your IP addresses settings.
 
 Primary:
 ```shell
 ##These are example values for configuring a primary node
 export baseroutername=gcevmr
 export nodetype=message_routing
-export routername=gcevmr1
+export routername=gcevmr0
 export configsync_enable=yes
 export redundancy_activestandbyrole=primary
 export redundancy_enable=yes
 export redundancy_group_password=gruyerecheese
-export redundancy_group_node_gcevmr0_connectvia=<MonitorIP>
-export redundancy_group_node_gcevmr0_nodetype=monitoring
-export redundancy_group_node_gcevmr1_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr0_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr0_nodetype=message_routing
+export redundancy_group_node_gcevmr1_connectvia=<BackupIP>
 export redundancy_group_node_gcevmr1_nodetype=message_routing
-export redundancy_group_node_gcevmr2_connectvia=<BackupIP>
-export redundancy_group_node_gcevmr2_nodetype=message_routing
+export redundancy_group_node_gcevmr2_connectvia=<MonitorIP>
+export redundancy_group_node_gcevmr2_nodetype=monitoring
 export redundancy_matelink_connectvia=<BackupIP>
 ```
 
@@ -140,17 +140,17 @@ Backup:
 ##These are example values for configuring a backup node
 export baseroutername=gcevmr
 export nodetype=message_routing
-export routername=gcevmr2
+export routername=gcevmr1
 export configsync_enable=yes
 export redundancy_activestandbyrole=backup
 export redundancy_enable=yes
 export redundancy_group_password=gruyerecheese
-export redundancy_group_node_gcevmr0_connectvia=<MonitorIP>
-export redundancy_group_node_gcevmr0_nodetype=monitoring
-export redundancy_group_node_gcevmr1_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr0_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr0_nodetype=message_routing
+export redundancy_group_node_gcevmr1_connectvia=<BackupIP>
 export redundancy_group_node_gcevmr1_nodetype=message_routing
-export redundancy_group_node_gcevmr2_connectvia=<BackupIP>
-export redundancy_group_node_gcevmr2_nodetype=message_routing
+export redundancy_group_node_gcevmr2_connectvia=<MonitorIP>
+export redundancy_group_node_gcevmr2_nodetype=monitoring
 export redundancy_matelink_connectvia=<PrimaryIP>
 ```
 
@@ -159,15 +159,15 @@ Monitor:
 ##These are example values for configuring a monitoring node
 export baseroutername=gcevmr
 export nodetype=monitoring
-export routername=gcevmr0
+export routername=gcevmr2
 export redundancy_enable=yes
 export redundancy_group_password=gruyerecheese
-export redundancy_group_node_gcevmr0_connectvia=<MonitorIP>
-export redundancy_group_node_gcevmr0_nodetype=monitoring
-export redundancy_group_node_gcevmr1_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr0_connectvia=<PrimaryIP>
+export redundancy_group_node_gcevmr0_nodetype=message_routing
+export redundancy_group_node_gcevmr1_connectvia=<BackupIP>
 export redundancy_group_node_gcevmr1_nodetype=message_routing
-export redundancy_group_node_gcevmr2_connectvia=<BackupIP>
-export redundancy_group_node_gcevmr2_nodetype=message_routing
+export redundancy_group_node_gcevmr2_connectvia=<MonitorIP>
+export redundancy_group_node_gcevmr2_nodetype=monitoring
 ```
 
 
@@ -202,11 +202,11 @@ As described in the [Solace documentation for configuring HA Group](https://docs
 
 ```shell
 # query redundancy status
-curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-version=\"soltr/8_5VMR\"><show><redundancy></redundancy></show></rpc>"
+curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><show><redundancy></redundancy></show></rpc>"
 
 # wait until redundancy is up then execute the assert command:
 
-curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc semp-version='soltr/8_5VMR'><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
+curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
 ```
 
 ## Step 4: Set up network security to allow access
