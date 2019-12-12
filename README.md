@@ -46,8 +46,9 @@ Repeat these instructions for all instances required, and follow the specific re
 
 > Tip: For an HA deployment, after the first Compute Engine instance has been created, go to its "VM instance details" by clicking on its name. Then use the "CREATE SIMILAR" button to create a new instance with most of the configuration details that will be described next pre-populated.
 
+Determine the PubSub+ event broker resource requirements based on the targeted [connection scaling](//docs.solace.com/Solace-SW-Broker-Set-Up/SW-Broker-Rel-Compat.htm#Connecti)
 
-Select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a size of at least 30 GB deployed on Centos7 OS:
+At a minimum, select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a size of at least 30 GB deployed on Centos7 OS:
 
 **Note:** In an HA deployment it's recommended to choose a different availability zone for each node. Also, the Monitor node requires only 1 vCPU and the standard 10 GB of disk space.
 
