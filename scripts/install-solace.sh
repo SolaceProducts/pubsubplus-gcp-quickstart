@@ -237,9 +237,9 @@ sudo sysctl -p /etc/sysctl.d/98-solace-sysctl.conf
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
 SOLACE_CLOUD_INIT="--env service_ssh_port=2222
-   --env service_webtransport_port=60080
-   --env service_webtransport_tlsport=60443
-   --env service_semp_tlsport=60943"
+   --env service_webtransport_port=8008
+   --env service_webtransport_tlsport=1443
+   --env service_semp_tlsport=1943"
 [ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_globalaccesslevel=${USERNAME}"
 [ ! -z "${PASSWORD}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_password=${PASSWORD}"
 for var_name in "${cloud_init_vars[@]}"; do
