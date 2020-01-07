@@ -1,38 +1,38 @@
-# Install a Solace PubSub+ Event Broker: Software onto Google Compute Engine Linux Virtual Machines
+# Install a Solace PubSub+ Software Event Broker onto Google Compute Engine Linux Virtual Machines
 
 ## Purpose of this repository
 
-This repository explains how to install a Solace PubSub+ Event Broker: Software (PubSub+ EBS) in various configurations onto Google Compute Engine (GCE) Linux Virtual Machines. This guide is intended for development and demo purposes.
+This repository explains how to install a Solace PubSub+ Software Event Broker in various configurations onto Google Compute Engine (GCE) Linux Virtual Machines. This guide is intended for development and demo purposes.
 
-The recommended Solace PubSub+ PubSub+ EBS version is 9.4 or later.
+The recommended event broker version is 9.4 or later.
 
-## Description of the Solace PubSub+ Event Broker: Software
+## Description of the Solace PubSub+ Software Event Broker
 
-The [Solace PubSub+ Platform](https://solace.com/products/platform/)'s [PubSub+ Event Broker: Software](https://solace.com/products/event-broker/software/) efficiently streams event-driven information between applications, IoT devices and user interfaces running in cloud, on-premises, and hybrid environments using open APIs and protocols like AMQP, JMS, MQTT, REST and WebSocket. It can be installed into a variety of public and private clouds, PaaS, and on-premises environments, and brokers in multiple locations can be linked together in an [event mesh](https://solace.com/what-is-an-event-mesh/) to dynamically share events across the distributed enterprise.
+The [Solace PubSub+ Platform](https://solace.com/products/platform/)'s [PubSub+ Software Event Broker](https://solace.com/products/event-broker/software/) efficiently streams event-driven information between applications, IoT devices and user interfaces running in cloud, on-premises, and hybrid environments using open APIs and protocols like AMQP, JMS, MQTT, REST and WebSocket. It can be installed into a variety of public and private clouds, PaaS, and on-premises environments, and brokers in multiple locations can be linked together in an [event mesh](https://solace.com/what-is-an-event-mesh/) to dynamically share events across the distributed enterprise.
 
-## How to deploy Solace PubSub+ EBS onto GCE
+## How to deploy Solace PubSub+ Software Event Broker onto GCE
 
-Solace PubSub+ EBS can be deployed in either a three-node High-Availability (HA) group, or as a single-node Standalone deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA deployment is required.
+Solace PubSub+ can be deployed in either a three-node High-Availability (HA) group, or as a single-node Standalone deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA deployment is required.
 
-## Step 1 (Optional): Obtain a reference to the Docker image of the Solace PubSub+ EBS to be deployed
+## Step 1 (Optional): Obtain a reference to the Docker image of the Solace PubSub+ Software Event Broker to be deployed
 
-First, decide which [Solace PubSub+ EBS type](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
+First, decide which [Solace PubSub+ Software Event Broker type](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
 
-**Note:** You can skip the rest of this step if you're using the default settings. By default this project installs the Standard edition of the Solace PubSub+ EBS from the latest Docker image available from Docker Hub.
+**Note:** You can skip the rest of this step if you're using the default settings. By default this project installs the Standard edition of the Solace PubSub+ Software Event Broker from the latest Docker image available from Docker Hub.
 
 The Docker image reference can be:
 
-*	A public or accessible private Docker registry repository name with an optional tag. This is the recommended option if using PubSub+ EBS Standard. The default is to use the latest PubSub+ EBS image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version [tag](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ).
+*	A public or accessible private Docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Software Event Broker Standard. The default is to use the latest PubSub+ image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version [tag](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ).
 
 *	A Docker image download URL
-     * If using Solace PubSub+ EBS Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ EBS Enterprise Evaluation Edition Docker Images section.
+     * If using Solace PubSub+ Software Event Broker Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Software Event Broker Enterprise Evaluation Edition Docker Images section.
 
-         | PubSub+ EBS Enterprise Evaluation Edition<br/>Docker Image
+         | PubSub+ Software Event Broker Enterprise Evaluation Edition<br/>Docker Image
          | :---: |
          | 90-day trial version of PubSub+ Enterprise |
          | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
 
-     * If you have purchased a Docker image of Solace PubSub+ EBS Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. You can then host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
+     * If you have purchased a Docker image of Solace PubSub+ Software Event Broker Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. You can then host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
 
 ## Step 2: Create the required GCE Compute Engine instances
 
@@ -48,7 +48,7 @@ Repeat these instructions for all instances required, and follow the specific re
 
 > Tip: For an HA deployment, after the first Compute Engine instance has been created, go to its "VM instance details" by clicking on its name. Then use the "CREATE SIMILAR" button to create a new instance with most of the configuration details that will be described next pre-populated.
 
-Determine the PubSub+ EBS resource requirements based on the targeted [connection scaling](//docs.solace.com/Solace-SW-Broker-Set-Up/SW-Broker-Rel-Compat.htm#Connecti)
+Determine the PubSub+ resource requirements based on the targeted [connection scaling](//docs.solace.com/Solace-SW-Broker-Set-Up/SW-Broker-Rel-Compat.htm#Connecti)
 
 At a minimum, select standard 2 vCPU machine type, and at least 6 GB of memory, a CentOS 7 OS, and a disk with a size of at least 30 GB deployed on Centos7 OS:
 
@@ -76,7 +76,7 @@ Take note of the configured IP addresses: `<PrimaryIP>`, `<BackupIP>` and `<Moni
 
 ![alt text](/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the following code according to your deployment configuration into the panel, replace the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broker-to-be-deployed ), and replace `ADMIN_PASSWORD` with the desired password for the management `admin` user.
+Cut and paste the following code according to your deployment configuration into the panel, the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broke-to-be-deployed ), and replace `ADMIN_PASSWORD` with the desired password for the management `admin` user.
 
 **Note:** For an HA deployment, additional environment variables are required (see the script section "Add here environment variables..." near the beginning), which is discussed below.   
 
@@ -179,7 +179,7 @@ export redundancy_group_node_gcevmr2_nodetype=monitoring
 
 ### Step 2d: Submit the create request
 
-Now hit the "Create" button at the bottom of this page. This will begin the process of starting the GCE instance, installing Docker, and finally downloading and installing the PubSub+ EBS. 
+Now hit the "Create" button at the bottom of this page. This will begin the process of starting the GCE instance, installing Docker, and finally downloading and installing the PubSub+ event broker. 
 
 It's possible to access the VM before the entire Solace solution is up. You can monitor `/var/lib/solace/install.log` for the following entry: `'date' INFO: Install is complete` to indicate when the installation has completed:
 
@@ -204,7 +204,7 @@ Fri Feb 22 19:04:54 UTC 2019 INFO: Install is complete
 
 ## Step 3: (HA cluster deployment only) Assert the primary event broker’s configuration
 
-As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ) it's required to assert the primary event broker’s configuration after a Solace PubSub+ EBS HA redundancy group is configured to support Guaranteed messaging. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node (replace `<ADMIN_PASSWORD>` according to your settings):
+As described in the [Solace documentation for configuring HA Group](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm ) it's required to assert the primary event broker’s configuration after a Solace PubSub+ HA redundancy group is configured to support Guaranteed messaging. This can be done through Solace CLI commands as in the [documentation](https://docs.solace.com/Configuring-and-Managing/Configuring-HA-Groups.htm#Config-Config-Sync ) or running following commands at the Primary node (replace `<ADMIN_PASSWORD>` according to your settings):
 
 ```shell
 # query redundancy status
