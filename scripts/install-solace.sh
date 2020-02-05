@@ -225,9 +225,21 @@ chmod 0600 /var/lib/solace/swap
 swapon -f /var/lib/solace/swap
 grep -q 'solace\/swap' /etc/fstab || sudo sh -c 'echo "/var/lib/solace/swap none swap sw 0 0" >> /etc/fstab'
 
+echo "`date` INFO: Applying TCP for WAN optimizations" &>> ${LOG_FILE}
+echo '
+  net.core.rmem_max = 134217728
+  net.core.wmem_max = 134217728
+  net.ipv4.tcp_rmem = 4096 25165824 67108864
+  net.ipv4.tcp_wmem = 4096 25165824 67108864
+  net.ipv4.tcp_mtu_probing=1' | sudo tee /etc/sysctl.d/98-solace-sysctl.conf
+sudo sysctl -p /etc/sysctl.d/98-solace-sysctl.conf
+
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
-SOLACE_CLOUD_INIT="--env SERVICE_SSH_PORT=2222"
+SOLACE_CLOUD_INIT="--env service_ssh_port=2222
+   --env service_webtransport_port=8008
+   --env service_webtransport_tlsport=1443
+   --env service_semp_tlsport=1943"
 [ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_globalaccesslevel=${USERNAME}"
 [ ! -z "${PASSWORD}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_password=${PASSWORD}"
 for var_name in "${cloud_init_vars[@]}"; do
@@ -243,8 +255,6 @@ docker create \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
    --ulimit nofile=${ulimit_nofile} \
-   --cap-add=IPC_LOCK \
-   --cap-add=SYS_NICE \
    --net=host \
    --restart=always \
    --env "system_scaling_maxconnectioncount=${maxconnectioncount}" \
