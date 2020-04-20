@@ -72,31 +72,15 @@ yum -y install lvm2
 
 echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------
-tee /etc/yum.repos.d/docker.repo <<-EOF
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
-echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
+yum -y install yum-utils
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
 echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
 # -------------------------
-yum -y install docker-engine
+yum -y install docker-ce docker-ce-cli containerd.io
 
 echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
-mkdir /etc/systemd/system/docker.service.d &>> install.log
-tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
-[Service]
-  ExecStart=
-  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
-EOF
-echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
-
-systemctl enable docker
 systemctl start docker
 
 ## First make sure Docker is actually up
