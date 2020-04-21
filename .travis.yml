@@ -22,7 +22,7 @@ before_install:
 install: true
 script:
 - pwd
-- >
+- |
   echo '#!/bin/bash
   SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest"
   ADMIN_PASSWORD="admin-password"
