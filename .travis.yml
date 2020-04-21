@@ -26,7 +26,7 @@ script:
   echo '#!/bin/bash
   SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest"
   ADMIN_PASSWORD="admin-password"
-  GITHUB_BRANCH="$TRAVIS_REPO_SLUG/$TRAVIS_BRANCH"
+  GITHUB_BRANCH=BRANCH_REF
   if [ ! -d /var/lib/solace ]; then
     mkdir /var/lib/solace
     cd /var/lib/solace
@@ -47,6 +47,7 @@ script:
     chmod +x /var/lib/solace/install-solace.sh
     /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE
   fi' > automation_script
+- sed -i "s:BRANCH_REF:${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}:g" automation_script
 - cat automation_script
 - export VM_NAME=travis-gcp-$(date +%s)
 - export NETWORK_TAG=$VM_NAME-tag
