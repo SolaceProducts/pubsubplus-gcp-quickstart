@@ -24,16 +24,9 @@ script:
 - pwd
 - >
   echo '#!/bin/bash
-  ##################################
-  # Update following variables as needed:
-  SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # Default to pull latest PubSub+ standard from docker hub
-  ADMIN_PASSWORD="admin-password"                                      # Update to a real password
+  SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest"
+  ADMIN_PASSWORD="admin-password"
   GITHUB_BRANCH="$TRAVIS_REPO_SLUG/$TRAVIS_BRANCH"
-  ##################################
-  # Add here environment variables for HA deployment, not required for single-node deployment.
-  # export ... see next section HA deployment environment variables
-  ##################################
-  #
   if [ ! -d /var/lib/solace ]; then
     mkdir /var/lib/solace
     cd /var/lib/solace
@@ -54,7 +47,7 @@ script:
     chmod +x /var/lib/solace/install-solace.sh
     /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE
   fi' > automation_script
-
+- cat automation_script
 - export VM_NAME=travis-gcp-$(date +%s)
 - export NETWORK_TAG=$VM_NAME-tag
 - export FIREWALL_RULE=$VM_NAME-access
