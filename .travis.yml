@@ -21,7 +21,7 @@ before_install:
 - rm ./keyfile
 install: true
 script:
-- pw
+- pwd
 - >
   echo '#!/bin/bash
   ##################################
@@ -64,6 +64,7 @@ script:
 - until gcloud compute instances list | grep $VM_NAME | grep RUNNING; do sleep 10; done
 - export url="$(gcloud compute instances list | grep $VM_NAME
   | awk '{print $5}')"; echo $url
+- sleep 30
 - curl -O https://sftp.solace.com/download/SDKPERF_C_LINUX64
 - tar -xvf SDKPERF_C_LINUX64
 - pubSubTools/sdkperf_c -cip=$url -mn=100000 -mr=0 -ptl=t1 -stl=t1 | grep "Total Messages"
