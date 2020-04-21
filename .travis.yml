@@ -1,0 +1,76 @@
+language: ruby
+sudo: required
+services:
+- docker
+before_install:
+- echo "Installing test gems"
+- gem install yaml-lint
+- export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+- echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee
+  -a /etc/apt/sources.list.d/google-cloud-sdk.list
+- curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+- sudo apt-get update
+- sudo apt-get install -y dpkg
+- sudo apt-get install google-cloud-sdk
+- curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.10.5/bin/linux/amd64/kubectl;
+  chmod +x ./kubectl; sudo mv ./kubectl /usr/bin/
+- sudo apt-get install jq
+- echo $GCP_KEY_FILE | base64 -d > ./keyfile
+- gcloud auth activate-service-account -q $(jq -r .client_email keyfile) --key-file=./keyfile
+  --project  $(jq -r .project_id keyfile)
+- rm ./keyfile
+install: true
+script:
+- pw
+- >
+  echo '#!/bin/bash
+  ##################################
+  # Update following variables as needed:
+  SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # Default to pull latest PubSub+ standard from docker hub
+  ADMIN_PASSWORD="admin-password"                                      # Update to a real password
+  GITHUB_BRANCH="$TRAVIS_REPO_SLUG/$TRAVIS_BRANCH"
+  ##################################
+  # Add here environment variables for HA deployment, not required for single-node deployment.
+  # export ... see next section HA deployment environment variables
+  ##################################
+  #
+  if [ ! -d /var/lib/solace ]; then
+    mkdir /var/lib/solace
+    cd /var/lib/solace
+    LOOP_COUNT=0
+    while [ $LOOP_COUNT -lt 30 ]; do
+      yum install -y wget || echo "yum not ready, waiting"
+      wget https://raw.githubusercontent.com/$GITHUB_BRANCH/scripts/install-solace.sh
+      if [ 0 != `echo $?` ]; then
+        ((LOOP_COUNT++))
+      else
+        break
+      fi
+    done
+    if [ ${LOOP_COUNT} == 30 ]; then
+      echo "`date` ERROR: Failed to download initial install script - exiting"
+      exit 1
+    fi
+    chmod +x /var/lib/solace/install-solace.sh
+    /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE
+  fi' > automation_script
+
+- export VM_NAME=gcp-quickstart-test-$(date +%s)"
+- gcloud compute instances create $VM_NAME --image-family centos-7 --image-project centos-cloud --create-disk size=20 --machine-type=n1-standard-2 --zone us-east1-b --metadata-from-file startup-script=./automation_script
+- gcloud compute instances add-tags $VM_NAME --zone us-east1-b --tags pubsubplus
+- gcloud compute firewall-rules create gcp-quickstart-test-access --target-tags pubsubplus --source-ranges 0.0.0.0/0 --allow tcp:60080,tcp:60443,tcp:8080,tcp:60943,tcp:1883,tcp:8000,tcp:9000,tcp:55003,tcp:55443,tcp:55555
+- until gcloud compute instances list | grep $VM_NAME | grep RUNNING; do sleep 10; done
+- export url="$(gcloud compute instances list | grep $VM_NAME
+  | awk '{print $5}')"; echo $url
+- curl -O https://sftp.solace.com/download/SDKPERF_C_LINUX64
+- tar -xvf SDKPERF_C_LINUX64
+- pubSubTools/sdkperf_c -cip=$url -mn=100000 -mr=0 -ptl=t1 -stl=t1 | grep "Total Messages"
+
+after_success:
+- echo "Test Success - Branch($TRAVIS_BRANCH) Pull Request($TRAVIS_PULL_REQUEST) Tag($TRAVIS_TAG)"
+- echo "YAML linted"
+- echo "GCP deployment tested"
+- echo "Messaging tested"
+
+after_script:
+- gcloud compute instances delete $VM_NAME --zone us-east1-b --quiet
