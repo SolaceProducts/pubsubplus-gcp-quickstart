@@ -55,10 +55,12 @@ script:
     /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE
   fi' > automation_script
 
-- export VM_NAME=gcp-quickstart-test-$(date +%s)"
+- export VM_NAME=travis-gcp-$(date +%s)
+- export NETWORK_TAG=$VM_NAME-tag
+- export FIREWALL_RULE=$VM_NAME-access
 - gcloud compute instances create $VM_NAME --image-family centos-7 --image-project centos-cloud --create-disk size=20 --machine-type=n1-standard-2 --zone us-east1-b --metadata-from-file startup-script=./automation_script
-- gcloud compute instances add-tags $VM_NAME --zone us-east1-b --tags pubsubplus
-- gcloud compute firewall-rules create gcp-quickstart-test-access --target-tags pubsubplus --source-ranges 0.0.0.0/0 --allow tcp:60080,tcp:60443,tcp:8080,tcp:60943,tcp:1883,tcp:8000,tcp:9000,tcp:55003,tcp:55443,tcp:55555
+- gcloud compute instances add-tags $VM_NAME --zone us-east1-b --tags $NETWORK_TAG
+- gcloud compute firewall-rules create $FIREWALL_RULE --target-tags $NETWORK_TAG --source-ranges 0.0.0.0/0 --allow tcp:60080,tcp:60443,tcp:8080,tcp:60943,tcp:1883,tcp:8000,tcp:9000,tcp:55003,tcp:55443,tcp:55555
 - until gcloud compute instances list | grep $VM_NAME | grep RUNNING; do sleep 10; done
 - export url="$(gcloud compute instances list | grep $VM_NAME
   | awk '{print $5}')"; echo $url
@@ -74,3 +76,4 @@ after_success:
 
 after_script:
 - gcloud compute instances delete $VM_NAME --zone us-east1-b --quiet
+- gcloud compute firewall-rules delete $FIREWALL_RULE --quiet
