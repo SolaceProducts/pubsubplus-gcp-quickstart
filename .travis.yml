@@ -64,6 +64,7 @@ script:
 - until gcloud compute instances list | grep $VM_NAME | grep RUNNING; do sleep 10; done
 - export url="$(gcloud compute instances list | grep $VM_NAME
   | awk '{print $5}')"; echo $url
+- until timeout 10 curl $url:8080; do sleep 5; done
 - sleep 30
 - curl -O https://sftp.solace.com/download/SDKPERF_C_LINUX64
 - tar -xvf SDKPERF_C_LINUX64
