@@ -182,19 +182,19 @@ elif [ ${MEM_SIZE} -lt 12000000 ]; then
   SWAP_SIZE="2048"
 elif [ ${MEM_SIZE} -lt 29000000 ]; then
   # 10000 if 12GiB<=mem<28GiB
-  maxconnectioncount="10000"
+  maxconnectioncount="1000" # Should be 10000 per sizing calculations, but PubSub+ Standard is capped at 1000 - This is checked when starting the container on version 9.7.0.29 (probably wasn't before)
   shmsize="2g"
   ulimit_nofile="2448:42192"
   SWAP_SIZE="2048"
 elif [ ${MEM_SIZE} -lt 58000000 ]; then
   # 100000 if 28GiB<=mem<56GiB
-  maxconnectioncount="100000"
+  maxconnectioncount="1000" # Should be 100000 per sizing calculations, but PubSub+ Standard is capped at 1000 - This is checked when starting the container on version 9.7.0.29 (probably wasn't before)
   shmsize="3380m"
   ulimit_nofile="2448:222192"
   SWAP_SIZE="2048"
 else
   # 200000 if 56GiB<=mem
-  maxconnectioncount="200000"
+  maxconnectioncount="1000" # Should be 200000 per sizing calculations, but PubSub+ Standard is capped at 1000 - This is checked when starting the container on version 9.7.0.29 (probably wasn't before)
   shmsize="3380m"
   ulimit_nofile="2448:422192"
   SWAP_SIZE="2048"
