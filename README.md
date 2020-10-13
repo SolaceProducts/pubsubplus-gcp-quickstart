@@ -50,7 +50,7 @@ Repeat these instructions for all instances required, and follow the specific re
 
 > Tip: For an HA deployment, after the first Compute Engine instance has been created, go to its "VM instance details" by clicking on its name. Then use the "CREATE SIMILAR" button to create a new instance with most of the configuration details that will be described next pre-populated.
 
-Determine the PubSub+ resource requirements based on the targeted [connection scaling](//docs.solace.com/Solace-SW-Broker-Set-Up/SW-Broker-Rel-Compat.htm#Connecti)
+Determine the PubSub+ container image resource requirements consulting the [System Resource Requirements](//docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/System-Resource-Requirements.htm#res-req-container), adjusted to the targeted System Scaling parameters [Maximum Possible Concurrent Client Connections](//docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/System-Scaling-Parameters.htm#max-client-connections) and [Maximum Possible Queue Messages](//docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/System-Scaling-Parameters.htm#max-queue-messages).
 
 At a minimum, select standard 2 vCPU machine type, and at least 2 GB of memory, a CentOS 7 OS, and a disk with a size of at least 30 GB deployed on Centos7 OS:
 
@@ -78,7 +78,7 @@ Take note of the configured IP addresses: `<PrimaryIP>`, `<BackupIP>` and `<Moni
 
 ![alt text](/images/gce_launch_2.png "GCE Image creation 2")
 
-Cut and paste the following code according to your deployment configuration into the panel, the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broke-to-be-deployed ), and replace `ADMIN_PASSWORD` with the desired password for the management `admin` user.
+Cut and paste the following code according to your deployment configuration into the panel, the value of the variable `SOLACE_DOCKER_IMAGE_REFERENCE` if required to the reference from [Step 1](#step-1-optional-obtain-a-reference-to-the-docker-image-of-the-solace-pubsub-message-broke-to-be-deployed ), and replace `ADMIN_PASSWORD` with the desired password for the management `admin` user and also adjust `MAX_CONNECTIONS` and `MAX_QUEUE_MESSAGES_MILLION` as required within the limits of the [PubSub+ edition you are using](https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/System-Scaling-Parameters.htm).
 
 **Note:** For an HA deployment, additional environment variables are required (see the script section "Add here environment variables..." near the beginning), which is discussed below.   
 
