@@ -88,6 +88,8 @@ Cut and paste the following code according to your deployment configuration into
 # Update following variables as needed:
 SOLACE_DOCKER_IMAGE_REFERENCE="solace/solace-pubsub-standard:latest" # Default to pull latest PubSub+ standard from docker hub
 ADMIN_PASSWORD="admin-password"                                      # Update to a real password
+MAX_CONNECTIONS=100                                                  # Broker system scaling: the maximum supported number of client connection
+MAX_QUEUE_MESSAGES_MILLION=100                                       # Broker system scaling: the maximum number of queue messages, in millions
 GITHUB_BRANCH="SolaceProducts/solace-gcp-quickstart/master"
 ##################################
 # Add here environment variables for HA deployment, not required for single-node deployment.
@@ -112,7 +114,7 @@ if [ ! -d /var/lib/solace ]; then
     exit 1
   fi
   chmod +x /var/lib/solace/install-solace.sh
-  /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE
+  /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE -n $MAX_CONNECTIONS -q $MAX_QUEUE_MESSAGES_MILLION
 fi
 ```
 
