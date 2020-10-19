@@ -3,12 +3,13 @@
 SOLACE_DOCKER_IMAGE_REF="solace/solace-pubsub-standard:latest"
 USERNAME=admin
 PASSWORD=admin
+MAX_CONNECTIONS=100
+MAX_QUEUE_MESSAGES_MILLION=100
 LOG_FILE=install.log
-SWAP_FILE=swap
 #cloud init vars
 #array of all available cloud init variables to attempt to detect and pass to docker image creation
 #see https://docs.solace.com/Configuring-and-Managing/SW-Broker-Specific-Config/Cloud-And-Machine-Tasks/Initializing-Config-Keys-With-Cloud-Init.htm
-cloud_init_vars=( routername nodetype service_semp_port system_scaling_maxconnectioncount configsync_enable redundancy_activestandbyrole redundancy_enable redundancy_group_password redundancy_matelink_connectvia service_redundancy_firstlistenport )
+cloud_init_vars=( routername nodetype service_semp_port system_scaling_maxconnectioncount system_scaling_maxqueuemessagecount configsync_enable redundancy_activestandbyrole redundancy_enable redundancy_group_password redundancy_matelink_connectvia service_redundancy_firstlistenport )
 
 # check if routernames contain any dashes or underscores and abort execution, if that is the case.
 if [[ $routername == *"-"* || $routername == *"_"* || $baseroutername == *"-"* || $baseroutername == *"_"* ]]; then
@@ -44,6 +45,14 @@ do
       ;;
       -u|--username)
         USERNAME="$2"
+        shift # past argument
+      ;;
+      -n|--maxconn)
+        MAX_CONNECTIONS="$2"
+        shift # past argument
+      ;;
+      -q|--maxqueuemillion)
+        MAX_QUEUE_MESSAGES_MILLION="$2"
         shift # past argument
       ;;
       *)
@@ -162,44 +171,12 @@ fi
 echo "`date` INFO: Successfully loaded ${SOLACE_DOCKER_IMAGE_REF} to local docker repo" &>> ${LOG_FILE}
 echo "`date` INFO: Solace message broker image and tag: `docker images | grep solace | awk '{print $1,":",$2}'`" &>> ${LOG_FILE}
 
+# Common for all scalings
+shmsize="1g"
+ulimit_nofile="2448:422192"
+SWAP_SIZE="2048"
 
-echo "`date` INFO:Set up swap" &>> ${LOG_FILE}
-# -----------------------------------------
-# Decide which scaling tier applies based on system memory
-# and set maxconnectioncount, ulimit, devshm and swap accordingly
-MEM_SIZE=`cat /proc/meminfo | grep MemTotal | tr -dc '0-9'`
-if [ ${MEM_SIZE} -lt 4000000 ]; then
-  # 100 if mem<4GiB
-  maxconnectioncount="100"
-  shmsize="1g"
-  ulimit_nofile="2448:6592"
-  SWAP_SIZE="1024"
-elif [ ${MEM_SIZE} -lt 12000000 ]; then
-  # 1000 if 4GiB<=mem<12GiB
-  maxconnectioncount="1000"
-  shmsize="2g"
-  ulimit_nofile="2448:10192"
-  SWAP_SIZE="2048"
-elif [ ${MEM_SIZE} -lt 29000000 ]; then
-  # 10000 if 12GiB<=mem<28GiB
-  maxconnectioncount="10000"
-  shmsize="2g"
-  ulimit_nofile="2448:42192"
-  SWAP_SIZE="2048"
-elif [ ${MEM_SIZE} -lt 58000000 ]; then
-  # 100000 if 28GiB<=mem<56GiB
-  maxconnectioncount="100000"
-  shmsize="3380m"
-  ulimit_nofile="2448:222192"
-  SWAP_SIZE="2048"
-else
-  # 200000 if 56GiB<=mem
-  maxconnectioncount="200000"
-  shmsize="3380m"
-  ulimit_nofile="2448:422192"
-  SWAP_SIZE="2048"
-fi
-echo "`date` INFO: Based on memory size of ${MEM_SIZE}KiB, determined maxconnectioncount: ${maxconnectioncount}, shmsize: ${shmsize}, ulimit_nofile: ${ulimit_nofile}, SWAP_SIZE: ${SWAP_SIZE}" &>> ${LOG_FILE}
+echo "`date` INFO: Using shmsize: ${shmsize}, ulimit_nofile: ${ulimit_nofile}, SWAP_SIZE: ${SWAP_SIZE}" &>> ${LOG_FILE}
 
 echo "`date` INFO: Creating Swap space" &>> ${LOG_FILE}
 mkdir /var/lib/solace
@@ -241,7 +218,8 @@ docker create \
    --ulimit nofile=${ulimit_nofile} \
    --net=host \
    --restart=always \
-   --env "system_scaling_maxconnectioncount=${maxconnectioncount}" \
+   --env "system_scaling_maxconnectioncount=${MAX_CONNECTIONS}" \
+   --env "system_scaling_maxqueuemessagecount=${MAX_QUEUE_MESSAGES_MILLION}" \
    ${SOLACE_CLOUD_INIT} \
    --name=solace ${SOLACE_IMAGE_ID}
 
