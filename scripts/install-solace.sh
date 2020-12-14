@@ -86,6 +86,14 @@ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce
 
 echo "`date` INFO: Intall Docker" &>> ${LOG_FILE}
 # -------------------------
+yum -y remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
 yum -y install docker-ce docker-ce-cli containerd.io
 
 echo "`date` INFO: Configure Docker as a service" &>> ${LOG_FILE}
