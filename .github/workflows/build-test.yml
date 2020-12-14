@@ -33,7 +33,7 @@ jobs:
     - name: Create automation script
       run: |
         echo '#!/bin/bash
-        SOLACE_DOCKER_IMAGE_REFERENCE="${{ secrets.BROKER_DOCKER_IMAGE_REF }}"
+        SOLACE_DOCKER_IMAGE_REFERENCE=${{ secrets.BROKER_DOCKER_IMAGE_REF }}
         ADMIN_PASSWORD="admin-password"
         MAX_CONNECTIONS=100                                                  # Broker system scaling: the maximum supported number of client connection
         MAX_QUEUE_MESSAGES_MILLION=100                                       # Broker system scaling: the maximum number of queue messages, in millions
