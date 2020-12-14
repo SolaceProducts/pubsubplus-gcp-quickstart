@@ -108,6 +108,8 @@ while [ ${loop_count} != ${loop_guard} ]; do
   fi
 done
 
+docker run hello-world
+
 echo "`date` INFO: Get the solace image" &>> ${LOG_FILE}
 # ------------------------------------------------
 # Determine first if SOLACE_DOCKER_IMAGE_REF is a valid docker registry uri
