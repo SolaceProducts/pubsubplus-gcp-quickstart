@@ -76,8 +76,8 @@ fi
 echo "`date` INFO: Get repositories up to date" &>> ${LOG_FILE}
 # ---------------------------------------
 
-yum -y update
-yum -y install lvm2
+# yum -y update
+# yum -y install lvm2
 
 echo "`date` INFO: Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------
@@ -86,14 +86,6 @@ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce
 
 echo "`date` INFO: Intall Docker" &>> ${LOG_FILE}
 # -------------------------
-yum -y remove docker \
-                  docker-client \
-                  docker-client-latest \
-                  docker-common \
-                  docker-latest \
-                  docker-latest-logrotate \
-                  docker-logrotate \
-                  docker-engine
 yum -y install docker-ce docker-ce-cli containerd.io
 
 echo "`date` INFO: Configure Docker as a service" &>> ${LOG_FILE}
@@ -116,7 +108,7 @@ while [ ${loop_count} != ${loop_guard} ]; do
   fi
 done
 
-docker run hello-world
+# docker run hello-world
 
 echo "`date` INFO: Get the solace image" &>> ${LOG_FILE}
 # ------------------------------------------------

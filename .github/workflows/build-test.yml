@@ -69,18 +69,18 @@ jobs:
         gcloud compute firewall-rules create $FIREWALL_RULE --target-tags $NETWORK_TAG --source-ranges 0.0.0.0/0 --allow tcp:60080,tcp:60443,tcp:8080,tcp:60943,tcp:1883,tcp:8000,tcp:9000,tcp:55003,tcp:55443,tcp:55555
         until gcloud compute instances list | grep $VM_NAME | grep RUNNING; do sleep 10; done
 
-    # - name: Test deployment
-    #   run: |
-    #     export url="$(gcloud compute instances list | grep $VM_NAME | awk '{print $5}')"; echo $url
-    #     until timeout 10 curl $url:8080; do sleep 5; done
-    #     sleep 30
-    #     curl -O https://sftp.solace.com/download/SDKPERF_C_LINUX64
-    #     tar -xvf SDKPERF_C_LINUX64
-    #     pubSubTools/sdkperf_c -cip=$url -mn=100000 -mr=0 -ptl=t1 -stl=t1 | grep "Total Messages"         # SMF messaging
-    #     curl $url:8080 | grep aurelia           # SEMP API
+    - name: Test deployment
+      run: |
+        export url="$(gcloud compute instances list | grep $VM_NAME | awk '{print $5}')"; echo $url
+        until timeout 10 curl $url:8080; do sleep 5; done
+        sleep 30
+        curl -O https://sftp.solace.com/download/SDKPERF_C_LINUX64
+        tar -xvf SDKPERF_C_LINUX64
+        pubSubTools/sdkperf_c -cip=$url -mn=100000 -mr=0 -ptl=t1 -stl=t1 | grep "Total Messages"         # SMF messaging
+        curl $url:8080 | grep aurelia           # SEMP API
 
-    # - name: Delete test resources (Cleanup)
-    #   if: ${{ always() }}
-    #   run: |
-    #     gcloud compute instances delete $VM_NAME --zone us-east1-b --quiet
-    #     gcloud compute firewall-rules delete $FIREWALL_RULE --quiet
+    - name: Delete test resources (Cleanup)
+      if: ${{ always() }}
+      run: |
+        gcloud compute instances delete $VM_NAME --zone us-east1-b --quiet
+        gcloud compute firewall-rules delete $FIREWALL_RULE --quiet
