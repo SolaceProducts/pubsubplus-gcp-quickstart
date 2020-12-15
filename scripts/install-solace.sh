@@ -81,17 +81,17 @@ echo "`date` INFO: Get repositories up to date" &>> ${LOG_FILE}
 
 echo "`date` INFO: Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------
-yum -y install yum-utils 2>&1 | tee ${LOG_FILE}
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 2>&1 | tee ${LOG_FILE}
+yum -y install yum-utils 2>>&1 | tee ${LOG_FILE}
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 2>>&1 | tee ${LOG_FILE}
 
 echo "`date` INFO: Intall Docker" &>> ${LOG_FILE}
 # -------------------------
-yum -y install docker-ce docker-ce-cli containerd.io 2>&1 | tee ${LOG_FILE}
+yum -y install docker-ce docker-ce-cli containerd.io 2>>&1 | tee ${LOG_FILE}
 
 echo "`date` INFO: Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
-systemctl start docker 2>&1 | tee ${LOG_FILE}
-docker run hello-world 2>&1 | tee ${LOG_FILE}
+systemctl start docker 2>>&1 | tee ${LOG_FILE}
+docker run hello-world 2>>&1 | tee ${LOG_FILE}
 
 ## First make sure Docker is actually up
 docker_running=""
@@ -108,8 +108,6 @@ while [ ${loop_count} != ${loop_guard} ]; do
     break
   fi
 done
-
-# docker run hello-world
 
 echo "`date` INFO: Get the solace image" &>> ${LOG_FILE}
 # ------------------------------------------------
