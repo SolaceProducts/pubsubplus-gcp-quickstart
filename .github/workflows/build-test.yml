@@ -1,15 +1,20 @@
 name: build
 
 # Controls when the action will run. 
-on:
-  pull_request:
+# on:
+#   pull_request:
 
-  push:
+#   push:
+
+on:
+  schedule:
+  - cron: "0/10 * * * *"
 
 jobs:
   deploy:
     name: GCP CI test
     runs-on: ubuntu-latest
+    timeout-minutes: 9
 
     steps:
     - name: Set env
