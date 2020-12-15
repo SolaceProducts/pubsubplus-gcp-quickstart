@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/SolaceProducts/pubsubplus-gcp-quickstart.svg?branch=master)](https://travis-ci.org/SolaceProducts/pubsubplus-gcp-quickstart)
+[![Actions Status](https://github.com/SolaceProducts/pubsubplus-gcp-quickstart/workflows/build/badge.svg?branch=master)](https://github.com/SolaceProducts/pubsubplus-gcp-quickstart/actions?query=workflow%3Abuild+branch%3Amaster)
 
 # Install a Solace PubSub+ Software Event Broker onto Google Compute Engine Linux Virtual Machines
 
