@@ -76,21 +76,22 @@ fi
 echo "`date` INFO: Get repositories up to date" &>> ${LOG_FILE}
 # ---------------------------------------
 
-yum -y update
-yum -y install lvm2
+# yum -y update
+# yum -y install lvm2
 
-echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
+echo "`date` INFO: Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------
-yum -y install yum-utils
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum -y install yum-utils | tee ${LOG_FILE}
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo | tee ${LOG_FILE}
 
-echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
+echo "`date` INFO: Intall Docker" &>> ${LOG_FILE}
 # -------------------------
-yum -y install docker-ce docker-ce-cli containerd.io
+yum -y install docker-ce docker-ce-cli containerd.io | tee ${LOG_FILE}
 
-echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
+echo "`date` INFO: Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
-systemctl start docker
+systemctl start docker | tee ${LOG_FILE}
+docker run hello-world | tee ${LOG_FILE}
 
 ## First make sure Docker is actually up
 docker_running=""

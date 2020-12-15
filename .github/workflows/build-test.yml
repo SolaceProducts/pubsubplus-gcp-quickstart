@@ -1,0 +1,87 @@
+name: build
+
+# Controls when the action will run. 
+on:
+  pull_request:
+
+  push:
+
+jobs:
+  deploy:
+    name: GCP CI test
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+
+    steps:
+    - name: Set env
+      run: |
+        VM_NAME=gha-gcp-$(date +%s)
+        echo "VM_NAME=$VM_NAME" >> $GITHUB_ENV
+        echo "NETWORK_TAG=$VM_NAME-tag" >> $GITHUB_ENV
+        echo "FIREWALL_RULE=$VM_NAME-access" >> $GITHUB_ENV
+        echo "TESTRUNBRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Create automation script
+      run: |
+        echo '#!/bin/bash
+        SOLACE_DOCKER_IMAGE_REFERENCE=IMG_REF
+        ADMIN_PASSWORD="admin-password"
+        MAX_CONNECTIONS=100                                                  # Broker system scaling: the maximum supported number of client connection
+        MAX_QUEUE_MESSAGES_MILLION=100                                       # Broker system scaling: the maximum number of queue messages, in millions
+        GITHUB_BRANCH=BRANCH_REF
+        if [ ! -d /var/lib/solace ]; then
+          mkdir /var/lib/solace
+          cd /var/lib/solace
+          LOOP_COUNT=0
+          while [ $LOOP_COUNT -lt 30 ]; do
+            yum install -y wget || echo "yum not ready, waiting"
+            wget https://raw.githubusercontent.com/$GITHUB_BRANCH/scripts/install-solace.sh
+            if [ 0 != `echo $?` ]; then
+              ((LOOP_COUNT++))
+            else
+              break
+            fi
+          done
+          if [ ${LOOP_COUNT} == 30 ]; then
+            echo "`date` ERROR: Failed to download initial install script - exiting"
+            exit 1
+          fi
+          chmod +x /var/lib/solace/install-solace.sh
+          /var/lib/solace/install-solace.sh -p $ADMIN_PASSWORD -i $SOLACE_DOCKER_IMAGE_REFERENCE -n $MAX_CONNECTIONS -q $MAX_QUEUE_MESSAGES_MILLION
+        fi' > automation_script
+        sed -i "s@BRANCH_REF@$GITHUB_REPOSITORY/$TESTRUNBRANCH@g" automation_script
+        sed -i "s@IMG_REF@${{ secrets.BROKER_DOCKER_IMAGE_REF }}@g" automation_script
+        cat automation_script
+
+    - name: Create deployment
+      run: |
+        gcloud compute instances create $VM_NAME --image-family centos-8 --image-project centos-cloud --create-disk size=20 --machine-type=n1-standard-2 --zone us-east1-b --metadata-from-file startup-script=./automation_script
+        gcloud compute instances add-tags $VM_NAME --zone us-east1-b --tags $NETWORK_TAG
+        gcloud compute firewall-rules create $FIREWALL_RULE --target-tags $NETWORK_TAG --source-ranges 0.0.0.0/0 --allow tcp:60080,tcp:60443,tcp:8080,tcp:60943,tcp:1883,tcp:8000,tcp:9000,tcp:55003,tcp:55443,tcp:55555
+        until gcloud compute instances list | grep $VM_NAME | grep RUNNING; do sleep 10; done
+
+    - name: Test deployment
+      run: |
+        export url="$(gcloud compute instances list | grep $VM_NAME | awk '{print $5}')"; echo $url
+        until timeout 10 curl $url:8080; do sleep 5; done
+        sleep 30
+        curl -O https://sftp.solace.com/download/SDKPERF_C_LINUX64
+        tar -xvf SDKPERF_C_LINUX64
+        pubSubTools/sdkperf_c -cip=$url -mn=100000 -mr=0 -ptl=t1 -stl=t1 | grep "Total Messages"         # SMF messaging
+        curl $url:8080 | grep aurelia           # SEMP API
+
+    - name: Delete test resources (Cleanup)
+      if: ${{ always() }}
+      run: |
+        gcloud compute instances delete $VM_NAME --zone us-east1-b --quiet
+        gcloud compute firewall-rules delete $FIREWALL_RULE --quiet
