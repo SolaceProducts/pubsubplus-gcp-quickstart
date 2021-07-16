@@ -216,7 +216,7 @@ curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><show><re
 
 # wait until redundancy is up then execute the assert command:
 
-curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
+curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><admin><config-sync><assert-leader><router/></assert-leader></config-sync></admin></rpc>"
 ```
 
 ## Step 4: Set up network security to allow access
