@@ -4,9 +4,9 @@
 
 ## Purpose of this repository
 
-This repository explains how to install a Solace PubSub+ Software Event Broker in various configurations onto Google Compute Engine (GCE) Linux Virtual Machines. This guide is intended for development and demo purposes.
+This repository explains how to install a Solace PubSub+ Software Event Broker in various configurations onto Google Compute Engine (GCE) Linux Virtual Machines.
 
-The supported event broker version is 9.7 or later. For earlier broker releases use [this GitHub version of the QuickStart](//github.com/SolaceProducts/pubsubplus-gcp-quickstart/tree/v1.0.0).
+This is a best practice template intended for development and demo purposes. The tested and recommended Solace PubSub+ Software Event Broker version is 9.10.
 
 ## Description of the Solace PubSub+ Software Event Broker
 
@@ -216,7 +216,7 @@ curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><show><re
 
 # wait until redundancy is up then execute the assert command:
 
-curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
+curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><admin><config-sync><assert-leader><router/></assert-leader></config-sync></admin></rpc>"
 ```
 
 ## Step 4: Set up network security to allow access
