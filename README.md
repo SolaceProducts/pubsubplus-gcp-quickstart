@@ -214,9 +214,11 @@ As described in the [Solace documentation for configuring HA Group](https://docs
 # query redundancy status
 curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><show><redundancy></redundancy></show></rpc>"
 
-# wait until redundancy is up then execute the assert command:
-
+# wait until redundancy is up, then execute the assert router command:
 curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><admin><config-sync><assert-leader><router/></assert-leader></config-sync></admin></rpc>"
+
+# assert the default message-vpn:
+curl -sS -u admin:<ADMIN_PASSWORD> http://localhost:8080/SEMP -d "<rpc><admin><config-sync><assert-leader><vpn-name>default</vpn-name></assert-leader></config-sync></admin></rpc>"
 ```
 
 ## Step 4: Set up network security to allow access
